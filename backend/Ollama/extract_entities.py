@@ -1,82 +1,86 @@
 import requests
 import json
+import time
 
-def extract_sensitive_entities(user_input, sensitive_data_json):
+def extract_sensitive_entities(user_input, sensitive_data_json, max_retries=3, backoff_factor=1):
     system_prompt = """
-You are a data privacy assistant tasked with identifying sensitive information in text. Sensitive data is defined by a dictionary called `sensitive_data_json`, where each key represents a type of sensitive information and each value contains a description of that type.
+You are a data privacy assistant tasked with identifying sensitive information and their positions in text. Sensitive data types and their definitions are provided.
 
-Your responsibilities:
-1. Parse `sensitive_data_json` to understand what qualifies as sensitive data.
-2. Detect occurrences of these types in the `user_input` text.
-3. For each key (data type), list **all exact substrings** from the input text that match the definition of that data type.
+Responsibilities:
+1. Understand definitions in `sensitive_data_json`.
+2. Detect occurrences of these sensitive types in the `user_input` text.
+3. For each entity detected, return the exact substring and its starting and ending positions in the original text.
 
-Your output must strictly follow this format:
+Strict JSON output format required:
 {
-  "EMAIL": [...],
-  "SSN": [...],
+  "EMAIL": [{"entity": "email@example.com", "start": 10, "end": 27}],
+  "SSN": [{"entity": "123-45-6789", "start": 100, "end": 111}],
   ...
 }
 
 Rules:
-- Only list data types defined in the dictionary.
-- If no data is found for a type, return an empty list for that type.
-- Do not explain or add any extra text. Just return the JSON object as described.
+- List only defined data types.
+- Use empty lists if no data found.
+- Provide valid JSON output without extra explanations.
 """
-
     user_prompt = f"""
-Here is the user input:
-\"{user_input}\"
+User input:
+"{user_input}"
 
-This is the sensitive data definition:
-\"{json.dumps(sensitive_data_json)}\"
+Sensitive data definitions:
+{sensitive_data_json}
 
-Please return a JSON object with the format:
-{{
-  "DATA_TYPE": ["list of matching entities"]
-}}
-
-**Important Notes**:
-- Only extract entities that are clearly defined in `sensitive_data_json`.
-- Do not invent or assume any extra types.
-- Output must be valid JSON. Do not include explanations.
+Respond strictly in the specified JSON format with entity positions.
 """
-
-    response = requests.post(
-        "http://localhost:11434/api/chat",
-        json={
-            "model": "mistral",
-            "messages": [
-                {"role": "system", "content": system_prompt.strip()},
-                {"role": "user", "content": user_prompt.strip()}
-            ],
-            "stream": False
-        }
-    )
-
-    if response.status_code == 200:
-        result = response.json()["message"]["content"]
-        return json.loads(result)
-    else:
-        raise Exception(f"Error: {response.status_code} - {response.text}")
-
-
-# Example run with extended corpus
-if __name__ == "__main__":
-    user_input = """
-Jane Smith lives at 123 Elm Street, Springfield, IL 62704. Her email is jane.smith92@gmail.com and her phone number is (312) 555-7890.
-She was born on 12/24/1988 and often uses her SSN 321-54-9876 for verification.
-Her credit card number is 4539 1488 0343 6467 and billing address is the same.
-She has another contact email at work: jane.s@company.org and a backup number 312-666-0001.
-Date of birth is sometimes listed as 1988-12-24 in official documents.
-"""
-
-    sensitive_data_json = {
-        "EMAIL": "Any string that represents an email address",
-        "SSN": "A US social security number in the format XXX-XX-XXXX",
-        "PHONE": "US phone number in formats like (XXX) XXX-XXXX or XXX-XXX-XXXX",
-        "CREDIT_CARD": "Any 16-digit number formatted like a credit card",
-        "ADDRESS": "Home or office address containing street names, numbers, zip code, or city",
-        "DOB": "Date of birth in formats like MM/DD/YYYY or YYYY-MM-DD"
+    url = "http://localhost:11434/api/chat"
+    payload = {
+        "model": "mistral",
+        "messages": [
+            {"role": "system", "content": system_prompt.strip()},
+            {"role": "user", "content": user_prompt.strip()}
+        ],
+        "stream": False
     }
+    attempt = 0
+    while attempt < max_retries:
+        try:
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()  # Raise for HTTP errors
+            response_json = response.json()
+            if "message" not in response_json or "content" not in response_json["message"]:
+                raise ValueError("Response JSON missing required 'message.content' key")
+            content = response_json["message"]["content"]
+            result = json.loads(content)
+            return result
+        except (requests.exceptions.RequestException, ValueError, json.JSONDecodeError) as e:
+            attempt += 1
+            if attempt >= max_retries:
+                raise Exception(f"Failed after {max_retries} attempts. Error: {str(e)}")
+            time.sleep(backoff_factor * attempt)
+    raise Exception("Unexpected error in extract_sensitive_entities")
 
-    extract_sensitive_entities(user_input, sensitive_data_json)
+def batch_process(text, sensitive_data_json, batch_size=1000):
+    results = []
+    for i in range(0, len(text), batch_size):
+        batch_text = text[i:i+batch_size]
+        try:
+            batch_entities = extract_sensitive_entities(batch_text, sensitive_data_json)
+        except Exception as e:
+            print(f"Error processing batch starting at index {i}: {e}")
+            batch_entities = {key: [] for key in sensitive_data_json.keys()}
+        # Adjust positions so they reflect the indices in the full text
+        for entity_type, entities in batch_entities.items():
+            validated_entities = []
+            for entity in entities:
+                if isinstance(entity, dict) and 'start' in entity and 'end' in entity:
+                    entity["start"] += i
+                    entity["end"] += i
+                    validated_entities.append(entity)
+            batch_entities[entity_type] = validated_entities
+        results.append(batch_entities)
+    # Merge results from all batches into one dictionary
+    merged_results = {key: [] for key in sensitive_data_json.keys()}
+    for batch_entities in results:
+        for entity_type, entities in batch_entities.items():
+            merged_results[entity_type].extend(entities)
+    return merged_results

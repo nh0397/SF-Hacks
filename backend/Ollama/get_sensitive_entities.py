@@ -1,7 +1,24 @@
-from extract_entities import extract_sensitive_entities
+from extract_entities import batch_process
+import json
+
+def compare_entities(user_entities, directory_entities):
+    """
+    Compares two sets of extraction results.
+    For each entity type in the directory, identifies any entity (based on its 'entity' text)
+    that appears in the directory results but not in the user-defined results.
+    """
+    additional = {}
+    for key, dir_entities in directory_entities.items():
+        user_list = user_entities.get(key, [])
+        user_entity_texts = set(e['entity'] for e in user_list)
+        additional_list = []
+        for entity in dir_entities:
+            if entity['entity'] not in user_entity_texts:
+                additional_list.append(entity)
+        additional[key] = additional_list
+    return additional
 
 if __name__ == "__main__":
-
     user_input = """
     Earlier this year, Jane S. relocated to 123 Elm Street, Springfield, IL 62704. Her cousin, Mark W., still lives at their old house—77 Waverly Blvd, Chicago, IL 60616. 
     While updating her records, she mentioned she was born on 12/24/1988, and just to be safe, she recited her 9-digit number: 321-54-9876. 
@@ -23,15 +40,33 @@ if __name__ == "__main__":
 
     Lastly, the reference form included some redacted digits: XXXX-XXXX-XXXX-6467.
     """
-
-
-    sensitive_data_json = {
-        "EMAIL": "Any string that represents an email address",
-        "SSN": "A US social security number in the format XXX-XX-XXXX",
-        "PHONE": "US phone number in formats like (XXX) XXX-XXXX or XXX-XXX-XXXX",
-        "CREDIT_CARD": "Any 16-digit number formatted like a credit card",
-        "ADDRESS": "Home or office address containing street names, numbers, zip code, or city",
-        "DOB": "Date of birth in formats like MM/DD/YYYY or YYYY-MM-DD"
+    
+    # User-specified sensitive definitions
+    user_sensitive_definitions = {
+        "EMAIL": "Any string that represents an email address. Example: email@example.com",
+        "SSN": "A US social security number in the format XXX-XX-XXXX. Example: 123-45-6789",
+        "PHONE": "US phone number in formats like (XXX) XXX-XXXX or XXX-XXX-XXXX. Example: (312) 555-7890",
+        "CREDIT_CARD": "Any 16-digit number formatted like a credit card. Example: 4539 1488 0343 6467",
+        "ADDRESS": "Home or office address containing street names, numbers, zip code, or city. Example: 123 Elm St., Springfield, IL 62704",
+        "DOB": "Date of birth in formats like MM/DD/YYYY or YYYY-MM-DD. Example: 12/24/1988 or 1988-12-24"
     }
-
-    print(extract_sensitive_entities(user_input, sensitive_data_json))
+    
+    # Load comprehensive sensitive directory from JSON file
+    with open("backend/Ollama/sensitive_directory.json", "r") as f:
+        sensitive_directory = json.load(f)
+    
+    # First extraction: using user-specified definitions
+    entities_user = batch_process(user_input, user_sensitive_definitions, batch_size=1000)
+    
+    # Second extraction: using comprehensive sensitive directory definitions
+    # entities_directory = batch_process(user_input, sensitive_directory, batch_size=1000)
+    
+    # Compare: Identify additional entities from the directory that are missing from the user extraction
+    # additional_entities = compare_entities(entities_user, entities_directory)
+    
+    final_result = {
+        "User_Sensitive_Entities": entities_user
+        # "Additional_Sensitive_Entities": additional_entities
+    }
+    
+    print(json.dumps(final_result, indent=2))
