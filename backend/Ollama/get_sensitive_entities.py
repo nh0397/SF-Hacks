@@ -18,25 +18,39 @@ def compare_entities(user_entities, directory_entities):
         additional[key] = additional_list
     return additional
 
+def pretty_print_entities(entities):
+    """
+    Prints the extracted entities in a more readable format.
+    """
+    print("\n=== Extracted Sensitive Entities ===\n")
+    for entity_type, items in entities.items():
+        if items:  # Only print if there are entities of this type
+            print(f"\n{entity_type}:")
+            for item in items:
+                print(f"  - {item['entity']}")
+                if 'confidence' in item:
+                    print(f"    Confidence: {item['confidence']:.2f}")
+    print("\n" + "="*30 + "\n")
+
 if __name__ == "__main__":
     user_input = """
     Earlier this year, Jane S. relocated to 123 Elm Street, Springfield, IL 62704. Her cousin, Mark W., still lives at their old house—77 Waverly Blvd, Chicago, IL 60616. 
     While updating her records, she mentioned she was born on 12/24/1988, and just to be safe, she recited her 9-digit number: 321-54-9876. 
     Ironically, she also mentioned her library ID which is 123-45-6789, which sometimes gets confused with more sensitive numbers.
 
-    During the call, the agent asked her to confirm the digits she’d used for government verification last year, and she repeated, “Yeah, that was the same number, 321549876, right?”
+    During the call, the agent asked her to confirm the digits she'd used for government verification last year, and she repeated, "Yeah, that was the same number, 321549876, right?"
     She emailed a scanned utility bill from ohine.smith92@gmail.com, which matched the billing address on her profile. Interestingly, the form also listed her backup email: jsmith_alt@protonmail.com.
 
     When asked for a payment method, she referred to her card: 4539 1488 0343 6467, and mentioned the zip tied to it was 62704. 
     Later she used a work phone number—(415) 333-9988—because her personal line (312-555-7890) was unreachable due to SIM issues.
 
-    Mark’s contact was also attached in the document: m.wilson@ymail.com, along with his alternate number 773.444.1122. 
-    Both addresses were marked under the “active contact file.”
+    Mark's contact was also attached in the document: m.wilson@ymail.com, along with his alternate number 773.444.1122. 
+    Both addresses were marked under the "active contact file."
 
-    Jane’s DOB was written in one place as 1988-12-24 and another form had it as Dec 24, ‘88. 
-    Her card billing address was mentioned simply as “same as home,” but one of the forms had “123 Elm St.” handwritten in.
+    Jane's DOB was written in one place as 1988-12-24 and another form had it as Dec 24, '88. 
+    Her card billing address was mentioned simply as "same as home," but one of the forms had "123 Elm St." handwritten in.
 
-    We noticed a number in the scanned form: 987654321, but it wasn’t clear whether it was a routing number or just a form ID.
+    We noticed a number in the scanned form: 987654321, but it wasn't clear whether it was a routing number or just a form ID.
 
     Lastly, the reference form included some redacted digits: XXXX-XXXX-XXXX-6467.
     """
@@ -69,4 +83,9 @@ if __name__ == "__main__":
         # "Additional_Sensitive_Entities": additional_entities
     }
     
+    # Print the results in a readable format
+    pretty_print_entities(entities_user)
+    
+    # Keep the JSON structure for analysis
+    print("JSON structure for analysis:")
     print(json.dumps(final_result, indent=2))
