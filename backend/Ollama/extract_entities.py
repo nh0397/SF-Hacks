@@ -55,9 +55,9 @@ Please return a JSON object with the format:
 
     if response.status_code == 200:
         result = response.json()["message"]["content"]
-        print("Detected Sensitive Entities:\n", result)
+        return json.loads(result)
     else:
-        print("Error:", response.status_code, response.text)
+        raise Exception(f"Error: {response.status_code} - {response.text}")
 
 
 # Example run with extended corpus
