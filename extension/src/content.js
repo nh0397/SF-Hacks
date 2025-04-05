@@ -69786,35 +69786,6 @@ g_ = ({ open: e, onClose: n, handleSubmit: o }) => {
         {
           className: "container px-1 pb-1 flex items-center justify-between",
         },
-        x.createElement(
-          "a",
-          {
-            className: "flex items-center",
-            href: "https://www.thesecurealley.com/",
-            target: "_blank",
-            rel: "noopener noreferrer",
-          },
-          x.createElement("img", {
-            src: t,
-            alt: "Secure Logo",
-            className: "w-8 h-8 mr-3",
-          }),
-          x.createElement(
-            "span",
-            { className: "text-md font-bold text-gray-800" },
-            "Secure Sense"
-          )
-        ),
-        x.createElement(
-          "a",
-          {
-            className: "text-blue-500 hover:text-blue-700 text-xs",
-            href: "http://www.thesecurealley.com/",
-            target: "_blank",
-            rel: "noopener noreferrer",
-          },
-          x.createElement("span", null, "Learn more")
-        )
       ),
       x.createElement(
         "div",

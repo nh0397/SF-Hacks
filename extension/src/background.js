@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener(function (s, o, e) {
           }
           try {
             const d = yield fetch(
-              `https://n75y3g9gv1.execute-api.ap-southeast-2.amazonaws.com/secure-alley/masking/himss_2025`,
+              `http://localhost:5000/mask/masking/${user}`,
               {
                 method: "POST",
                 headers: {
@@ -125,7 +125,7 @@ function m(s) {
 
       // Use the retrieved user in the fetch URL
       const o = yield fetch(
-        `https://n75y3g9gv1.execute-api.ap-southeast-2.amazonaws.com/secure-alley/policies/himss_2025`,
+        `http://localhost:5000/policy/policies/${user}`,
         { method: "GET" }
       );
 
@@ -160,7 +160,7 @@ chrome.runtime.onMessage.addListener((s, o, e) => {
       n = { username: c, password: a };
     try {
       fetch(
-        "https://n75y3g9gv1.execute-api.ap-southeast-2.amazonaws.com/secure-alley/login",
+        "http://localhost:5000/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

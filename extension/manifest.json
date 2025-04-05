@@ -4,7 +4,7 @@
   "description": "This Chrome Extension provides a privacy guard that protects you against sharing sensitive information on LLM platforms.",
   "version": "0.1.5",
   "action": {
-    "default_icon": "image.png",
+    "default_icon": "image.jpg",
     "default_popup": "src/popup/popup.html"
   },
   "host_permissions": ["https://chat.openai.com/*", "http://localhost:3001/*","http://127.0.0.1:5000/*"],
@@ -19,7 +19,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["image.png"],
+      "resources": ["image.jpg"],
       "matches": ["https://chat.openai.com/*", "https://chatgpt.com/*"]
     }
   ],
