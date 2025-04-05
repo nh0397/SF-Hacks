@@ -17,8 +17,6 @@ jwt = JWTManager(app)
 
 # Register the Blueprints
 app.register_blueprint(auth_bp, url_prefix='/auth')
-# app.register_blueprint(policy_bp, url_prefix="/policy")
-# app.register_blueprint(masking_bp, url_prefix="/masking")
 
 @app.route('/')
 def index():
