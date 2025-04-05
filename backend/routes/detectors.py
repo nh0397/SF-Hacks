@@ -113,4 +113,60 @@ def delete_detector():
         return jsonify({"message": "Detector deleted successfully"}), 200
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    
+@detector_bp.route('/update_detector', methods=['PUT'])
+@jwt_required()
+def update_detector():
+    try:
+        # Get the current user from JWT
+        user_id = get_jwt_identity()
 
+        # Parse the request body
+        data = request.get_json()
+        detector_name = data.get('detector_name', "")
+        new_detector_name = data.get('new_detector_name', "")
+        detector_type = data.get('detector_type', "")
+
+        # Validate input
+        if not detector_name or not new_detector_name or not detector_type:
+            return jsonify({"error": "Detector name, new detector name and type are required"}), 400
+
+        # Prepare the update document
+        update_document = {
+            "detector_name": new_detector_name,
+            "detector_type": detector_type,
+            "updated_at": datetime.utcnow().isoformat()
+        }
+
+        if detector_type == "ml_based":
+            description = data.get('description', "")
+            if not description:
+                return jsonify({"error": "Description is required for ML-based detectors"}), 400
+            update_document["description"] = description
+        elif detector_type == "regex":
+            regex_patters = data.get('regex_patterns', [])
+            if not regex_patters:
+                return jsonify({"error": "Regex patterns are required for regex detectors"}), 400
+            update_document["regex_patterns"] = regex_patters
+        elif detector_type == "keywords":
+            keywords = data.get('keywords', [])
+            if not keywords:
+                return jsonify({"error": "Keywords are required for keyword detectors"}), 400
+            update_document["keywords"] = keywords
+
+        else:
+            return jsonify({"error": "Only ml based, regex, keywords detector_type allowed"}), 400
+
+        # Update the detector in MongoDB
+        result = detectors_collection.update_one(
+            {"detector_name": detector_name, "user_id": user_id},
+            {"$set": update_document}
+        )
+
+        if result.matched_count == 0:
+            return jsonify({"error": "Detector not found or you don't have access to this detector"}), 404
+
+        return jsonify({"message": "Detector updated successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
