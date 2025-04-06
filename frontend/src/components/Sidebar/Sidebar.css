@@ -1,0 +1,257 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 64px;
+    /* Height of navbar */
+    bottom: 0;
+    background-color: white;
+    border-right: 1px solid #f3f4f6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: width 0.3s ease-in-out;
+    overflow: hidden;
+    z-index: 40;
+    width: 256px;
+}
+
+.sidebar-collapsed {
+    width: 64px;
+    overflow: hidden;
+}
+
+.sidebar-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.collapse-button-div {
+    display: flex;
+    justify-content: end;
+    padding: 10px;
+}
+
+/* Register Button */
+.register-button-container {
+    margin-top: 16px;
+    margin-bottom: 24px;
+    padding: 0 8px;
+}
+
+.register-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #0047AB;
+    /* 🔵 Secure Alley's Primary Color */
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.register-button:hover {
+    background-color: #003b8b;
+    /* 🔵 Darker Shade for Hover */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.register-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 71, 171, 0.5);
+}
+
+.register-button-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.register-button-plus {
+    font-size: 20px;
+}
+
+/* Navigation */
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-nav-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Sidebar Item */
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin: 4px 0;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-item:hover {
+    background-color: #f3f4f6;
+}
+
+.sidebar-item-active {
+    background-color: #dce5f6;
+    /* 🔵 Updated to Secure Alley's Theme */
+    color: #0047AB;
+}
+
+.sidebar-item-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.sidebar-item-icon-label {
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-item-icon {
+    color: #6b7280;
+    transition: color 0.2s ease;
+}
+
+.sidebar-item:hover .sidebar-item-icon {
+    color: #4b5563;
+}
+
+.sidebar-item-icon-active {
+    color: #0047AB;
+    /* 🔵 Secure Alley's Primary Color */
+}
+
+.sidebar-item-label {
+    margin-left: 12px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sidebar-item-chevron {
+    color: #9ca3af;
+    transition: color 0.2s ease;
+}
+
+.sidebar-item:hover .sidebar-item-chevron {
+    color: #6b7280;
+}
+
+/* Mobile App Promo */
+.mobile-app-promo {
+    margin-top: 16px;
+    background-color: #dce5f6;
+    /* 🔵 Light Blue Shade */
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.decoration-circle-1 {
+    position: absolute;
+    bottom: -24px;
+    right: -24px;
+    width: 64px;
+    height: 64px;
+    background-color: #b2c8e8;
+    /* 🔵 Updated */
+    border-radius: 50%;
+}
+
+.decoration-circle-2 {
+    position: absolute;
+    top: -24px;
+    left: -24px;
+    width: 48px;
+    height: 48px;
+    background-color: #a7f3d0;
+    border-radius: 50%;
+}
+
+.mobile-app-promo-content {
+    position: relative;
+}
+
+.mobile-app-promo-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.mobile-app-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.app-store-button {
+    background-color: black;
+    color: white;
+    padding: 4px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.play-store-button {
+    background-color: white;
+    color: black;
+    padding: 4px;
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.app-store-button:hover,
+.play-store-button:hover {
+    transform: translateY(-2px);
+}
+
+/* Collapse Button */
+.collapse-button {
+    margin-top: 16px;
+    width: 32px;
+    height: 32px;
+    background-color: #f3f4f6;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.collapse-button:hover {
+    background-color: #e5e7eb;
+}
+
+.collapse-button-icon {
+    color: #6b7280;
+    transition: transform 0.3s ease;
+}
+
+.collapse-button-icon-collapsed {
+    transform: rotate(180deg);
+}
