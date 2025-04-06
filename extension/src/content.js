@@ -69415,82 +69415,32 @@ if (!document.getElementById("dark-mode-style")) {
   injectDarkModeStyles();
 }
 
-const Loader = () => {
-  const loaderContainer = document.createElement("div");
-  loaderContainer.className = "loader-container";
-  loaderContainer.innerHTML = `
-    <div class="loader"></div>
-    <style>
-      .loader-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.8);
-        z-index: 9999;
-      }
-      .loader {
-        border: 12px solid #f3f3f3;
-        border-top: 12px solid #3498db;
-        border-radius: 50%;
-        width: 90px;
-        height: 90px;
-        animation: spin 2s linear infinite;
-      }
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
-  `;
-  return loaderContainer;
-};
 
-let _loader = { textarea: null, button: null };
-let loader;
-
-function showLoader() {
-  if (!loader) {
-    loader = Loader();
-    document.body.appendChild(loader);
-  }
-}
-
-function hideLoader() {
-  if (loader) {
-    document.body.removeChild(loader);
-    loader = null;
-  }
-}
 
 var d_ = u_();
 const vt = Bt(d_),
-  c_ = ({
-    isVisible: e,
-    originalQuery: n,
-    message: o,
-    masked_entities = {}, // ✅ Added masked_entities
-    onProceed: t,
-    onBackToEditing: l,
-    onClose: s,
-  }) => {
-    const [d, g] = To.useState(!0),
-      [m, y] = To.useState("tab1"),
-      [f, v] = To.useState(""),
-      [M, G] = To.useState(1);
-    if (!e) return null;
+c_ = ({
+  isVisible: e,
+  originalQuery: n,
+  message: o,
+  masked_entities = {}, // ✅ Added masked_entities
+  onProceed: t,
+  onBackToEditing: l,
+  onClose: s,
+}) => {
+  const [d, g] = To.useState(!0),
+    [m, y] = To.useState("tab1"),
+    [f, v] = To.useState(""),
+    [M, G] = To.useState(1);
+  if (!e) return null;
 
-    const ae = chrome.runtime.getURL("../image.png"),
-      Y = (We) => {
-        y(We), G(1);
-      },
-      U = () => {
-        M === 1 ? G(2) : t(!d);
-      };
+  const ae = chrome.runtime.getURL("../image.png"),
+    Y = (We) => {
+      y(We), G(1);
+    },
+    U = () => {
+      M === 1 ? G(2) : t(!d);
+    };
 
     return x.createElement(
       "div",
@@ -69508,7 +69458,7 @@ const vt = Bt(d_),
             animation: "fadeInUp 0.7s ease-in-out", // ✅ Smooth fade-in from below
           },
         },
-
+    
         /* Header Section */
         x.createElement(
           "div",
@@ -69552,34 +69502,28 @@ const vt = Bt(d_),
             )
           )
         ),
-
+    
         /* Masked Entities Section - ✅ Glassmorphism effect */
         x.createElement(
           "div",
           {
             className:
               "bg-white p-4 rounded-lg shadow-inner mb-4 border border-black",
-            style: {
-              animation: "fadeIn 1.25s ease-in-out",
-              backdropFilter: "blur(5px)",
-            }, // ✅ Blur effect
+            style: { animation: "fadeIn 1.25s ease-in-out", backdropFilter: "blur(5px)" }, // ✅ Blur effect
           },
           x.createElement(
             "p",
-            {
-              className:
-                "text-black text-sm font-bold mb-2 uppercase tracking-wide",
-            },
+            { className: "text-black text-sm font-bold mb-2 uppercase tracking-wide" },
             "SENSITIVE INFORMATION DETECTED:"
           ),
           x.createElement(
             "div",
-            {
-              className: "flex flex-wrap gap-2",
-              style: {
-                maxHeight: "5.5rem",
-                overflow: "auto",
+            { className: "flex flex-wrap gap-2" ,
+              style:{
+                maxHeight : "5.5rem",
+                overflow:"auto",
               },
+
             },
             Object.entries(masked_entities).map(([key, value], index) =>
               x.createElement(
@@ -69589,9 +69533,7 @@ const vt = Bt(d_),
                     "bg-white text-black text-sm font-semibold px-4 py-2 rounded-full shadow-md border border-black",
                   title: value,
                   style: {
-                    animation: `slideIn 1.75s ease-in-out ${
-                      index * 0.3
-                    }s forwards`, // ✅ Show text one by one
+                    animation: `slideIn 1.75s ease-in-out ${index * 0.3}s forwards`, // ✅ Show text one by one
                     opacity: 0,
                   },
                 },
@@ -69600,7 +69542,7 @@ const vt = Bt(d_),
             )
           )
         ),
-
+    
         /* Message Section - ✅ Fades in */
         x.createElement(
           "p",
@@ -69610,7 +69552,7 @@ const vt = Bt(d_),
           },
           "Secure Sense detected sensitive data in your input. Your organization requires you to review this data before submitting it."
         ),
-
+    
         /* Buttons - ✅ Perfect hover and border styles */
         x.createElement(
           "div",
@@ -69643,222 +69585,242 @@ const vt = Bt(d_),
         )
       )
     );
-  },
-  h_ = ({ open: e, handleClose: n }) =>
-    x.createElement(
-      x.Fragment,
-      null,
-      e &&
-        x.createElement(
-          "div",
-          {
-            className:
-              "fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md",
-            style: {
-              animation: "zoomIn 1s ease-in-out",
-              backdropFilter: "blur(5px)",
-            },
-          },
-          x.createElement(
-            "div",
-            {
-              className:
-                "bg-white w-11/12 max-w-md rounded-lg shadow-lg p-6 border border-black relative",
-              style: { animation: "fadeInUp 0.7s ease-in-out" },
-            },
-            // Close button at top right
-            x.createElement(
-              "button",
-              {
-                onClick: n,
-                className:
-                  "absolute top-4 right-4 text-black hover:text-red-500 transition transform hover:scale-110 focus:outline-none",
-              },
-              "×"
-            ),
-            x.createElement(
-              "div",
-              {
-                className: "flex items-center gap-2 text-red-600 mb-4",
-                style: { animation: "fadeIn 1.25s ease-in-out" },
-              },
-              x.createElement(
-                "svg",
-                {
-                  xmlns: "http://www.w3.org/2000/svg",
-                  className: "h-6 w-6",
-                  fill: "none",
-                  viewBox: "0 0 24 24",
-                  stroke: "currentColor",
-                  strokeWidth: 2,
-                },
-                x.createElement("path", {
-                  strokeLinecap: "round",
-                  strokeLinejoin: "round",
-                  d: "M18.364 5.636a9 9 0 11-12.728 0 9 9 0 0112.728 0zM12 9v4m0 4h.01",
-                })
-              ),
-              x.createElement(
-                "h2",
-                { className: "text-lg font-bold text-black" },
-                "Blocked"
-              )
-            ),
-            x.createElement(
-              "p",
-              {
-                className: "text-black mb-6",
-                style: { animation: "fadeIn 2s ease-in-out" },
-              },
-              "Your access to this feature has been restricted due to policy violations or other reasons. If you believe this is a mistake, please contact support."
-            ),
-            x.createElement(
-              "div",
-              {
-                className: "flex flex-col gap-2",
-                style: { animation: "fadeInUp 3s ease-in-out" },
-              },
-              x.createElement(
-                "button",
-                {
-                  onClick: () => alert("Contact Support"),
-                  className:
-                    "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition transform hover:scale-105 focus:outline-none shadow-md",
-                },
-                "Contact Support"
-              ),
-              x.createElement(
-                "button",
-                {
-                  onClick: () => alert("Learn More"),
-                  className:
-                    "border border-black text-black px-4 py-2 rounded hover:bg-gray-100 transition transform hover:scale-105 shadow-md",
-                },
-                "Learn More"
-              )
-            )
-          )
-        )
-    );
-
-g_ = ({ open: e, onClose: n, handleSubmit: o }) => {
-  const t = chrome.runtime.getURL("../image.png"),
-    [l, s] = To.useState({ username: "", password: "", remember: !1 }),
-    d = (m) => {
-      const { name: y, value: f, type: v, checked: M } = m.target;
-      s((G) => Mg(bg({}, G), { [y]: v === "checkbox" ? M : f }));
-    },
-    g = To.useCallback(() => {
-      o(l), n();
-    }, [l, o, n]);
-  return x.createElement(
-    "div",
-    {
-      style: {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "rgba(0, 0, 0, 0.5)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 9999,
-      },
-    },
-    x.createElement(
-      "div",
-      {
-        style: {
-          background: "white",
-          padding: "20px",
-          borderRadius: "8px",
-          width: "100%",
-          maxWidth: "400px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-        },
-      },
-      x.createElement(
-        "div",
-        {
-          className: "container px-1 pb-1 flex items-center justify-between",
-        },
-      ),
-      x.createElement(
-        "div",
-        { className: "container flex flex-col text-sm px-6 mb-4" },
-        x.createElement(
-          "form",
-          { className: "container flex flex-col space-y-4" },
-          x.createElement(
-            "div",
-            {
-              className:
-                "container text-center font-bold text-lg text-gray-600 pt-6 pb-2",
-            },
-            "Welcome to Secure Sense"
-          ),
-          x.createElement("input", {
-            type: "text",
-            name: "username",
-            value: l.username,
-            placeholder: "Username",
-            className:
-              "border rounded text-black placeholder:text-gray-600 w-full",
-            required: !0,
-            onChange: d,
-          }),
-          x.createElement("input", {
-            type: "password",
-            name: "password",
-            value: l.password,
-            placeholder: "Password",
-            className:
-              "border rounded text-black placeholder:text-gray-600 w-full",
-            required: !0,
-            onChange: d,
-          }),
-          x.createElement(
-            "div",
-            { className: "container flex items-center gap-2" },
-            x.createElement("input", {
-              type: "checkbox",
-              name: "remember",
-              checked: l.remember,
-              className: "border rounded px-2 py-1",
-              onChange: d,
-            }),
-            x.createElement(
-              "label",
-              { htmlFor: "remember", className: "text-gray-600" },
-              "Remember me"
-            )
-          ),
-          x.createElement(
-            "button",
-            {
-              type: "submit",
-              className: "bg-blue-500 text-white rounded px-4 py-2 w-full ",
-              onClick: g,
-            },
-            "Sign In"
-          )
-        )
-      ),
+    
+    
+    
+    
+},
+h_ = ({ open: e, handleClose: n }) =>
+  x.createElement(
+    x.Fragment,
+    null,
+    e &&
       x.createElement(
         "div",
         {
           className:
-            "container text-blue-500 grid px-2 py-2 items-center text-center text-xs",
+            "fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md",
+          style: { animation: "zoomIn 1s ease-in-out", backdropFilter: "blur(5px)" },
         },
-        "By signing in, you agree to our Terms & Conditions and Privacy Policy"
+        x.createElement(
+          "div",
+          {
+            className:
+              "bg-white w-11/12 max-w-md rounded-lg shadow-lg p-6 border border-black relative",
+            style: { animation: "fadeInUp 0.7s ease-in-out" },
+          },
+          // Close button at top right
+          x.createElement(
+            "button",
+            {
+              onClick: n,
+              className:
+                "absolute top-4 right-4 text-black hover:text-red-500 transition transform hover:scale-110 focus:outline-none",
+            },
+            "×"
+          ),
+          x.createElement(
+            "div",
+            {
+              className: "flex items-center gap-2 text-red-600 mb-4",
+              style: { animation: "fadeIn 1.25s ease-in-out" },
+            },
+            x.createElement(
+              "svg",
+              {
+                xmlns: "http://www.w3.org/2000/svg",
+                className: "h-6 w-6",
+                fill: "none",
+                viewBox: "0 0 24 24",
+                stroke: "currentColor",
+                strokeWidth: 2,
+              },
+              x.createElement("path", {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                d: "M18.364 5.636a9 9 0 11-12.728 0 9 9 0 0112.728 0zM12 9v4m0 4h.01",
+              })
+            ),
+            x.createElement(
+              "h2",
+              { className: "text-lg font-bold text-black" },
+              "Blocked"
+            )
+          ),
+          x.createElement(
+            "p",
+            {
+              className: "text-black mb-6",
+              style: { animation: "fadeIn 2s ease-in-out" },
+            },
+            "Your access to this feature has been restricted due to policy violations or other reasons. If you believe this is a mistake, please contact support."
+          ),
+          x.createElement(
+            "div",
+            {
+              className: "flex flex-col gap-2",
+              style: { animation: "fadeInUp 3s ease-in-out" },
+            },
+            x.createElement(
+              "button",
+              {
+                onClick: () => alert("Contact Support"),
+                className:
+                  "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition transform hover:scale-105 focus:outline-none shadow-md",
+              },
+              "Contact Support"
+            ),
+            x.createElement(
+              "button",
+              {
+                onClick: () => alert("Learn More"),
+                className:
+                  "border border-black text-black px-4 py-2 rounded hover:bg-gray-100 transition transform hover:scale-105 shadow-md",
+              },
+              "Learn More"
+            )
+          )
+        )
       )
-    )
   );
-};
+
+  g_ = ({ open: e, onClose: n, handleSubmit: o }) => {
+    const t = chrome.runtime.getURL("../image.png"),
+      [l, s] = To.useState({ username: "", password: "", remember: !1 }),
+      d = (m) => {
+        const { name: y, value: f, type: v, checked: M } = m.target;
+        s((G) => Mg(bg({}, G), { [y]: v === "checkbox" ? M : f }));
+      },
+      g = To.useCallback(() => {
+        o(l), n();
+      }, [l, o, n]);
+    return x.createElement(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 9999,
+        },
+      },
+      x.createElement(
+        "div",
+        {
+          style: {
+            background: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            width: "100%",
+            maxWidth: "400px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            display: "flex",
+            flexDirection: "column",
+          },
+        },
+        x.createElement(
+          "div",
+          {
+            className: "container px-1 pb-1 flex items-center justify-between",
+          },
+          x.createElement(
+            "a",
+            {
+              className: "flex items-center",
+              href: "https://www.thesecurealley.com/",
+              target: "_blank",
+              rel: "noopener noreferrer",
+            },
+            x.createElement("img", {
+              src: t,
+              alt: "Secure Logo",
+              className: "w-8 h-8 mr-3",
+            }),
+            x.createElement(
+              "span",
+              { className: "text-md font-bold text-gray-800" },
+              "Secure Sense"
+            )
+          )
+        ),
+        x.createElement(
+          "div",
+          { className: "container flex flex-col text-sm px-6 mb-4" },
+          x.createElement(
+            "form",
+            { className: "container flex flex-col space-y-4" },
+            x.createElement(
+              "div",
+              {
+                className:
+                  "container text-center font-bold text-lg text-gray-600 pt-6 pb-2",
+              },
+              "Welcome to Secure Sense"
+            ),
+            x.createElement("input", {
+              type: "text",
+              name: "username",
+              value: l.username,
+              placeholder: "Username",
+              className:
+                "border rounded text-black placeholder:text-gray-600 w-full",
+              required: !0,
+              onChange: d,
+            }),
+            x.createElement("input", {
+              type: "password",
+              name: "password",
+              value: l.password,
+              placeholder: "Password",
+              className:
+                "border rounded text-black placeholder:text-gray-600 w-full",
+              required: !0,
+              onChange: d,
+            }),
+            x.createElement(
+              "div",
+              { className: "container flex items-center gap-2" },
+              x.createElement("input", {
+                type: "checkbox",
+                name: "remember",
+                checked: l.remember,
+                className: "border rounded px-2 py-1",
+                onChange: d,
+              }),
+              x.createElement(
+                "label",
+                { htmlFor: "remember", className: "text-gray-600" },
+                "Remember me"
+              )
+            ),
+            x.createElement(
+              "button",
+              {
+                type: "submit",
+                className: "bg-blue-500 text-white rounded px-4 py-2 w-full ",
+                onClick: g,
+              },
+              "Sign In"
+            )
+          )
+        ),
+        x.createElement(
+          "div",
+          {
+            className:
+              "container text-blue-500 grid px-2 py-2 items-center text-center text-xs",
+          },
+          "By signing in, you agree to our Terms & Conditions and Privacy Policy"
+        )
+      )
+    );
+  };
 let _n = { textarea: null, button: null };
 function zy(e) {
   return gn(this, null, function* () {
@@ -69896,69 +69858,70 @@ const m_ = ({
     onBackToEditing: l,
     onClose: l,
   });
-function ud(e) {
-  return gn(this, null, function* () {
-    const {
-        original_input = "",
-        masked_input = "",
-        is_sensitive = false,
-        masked_entities = {},
-        is_block = false,
-        blocked_entities = [],
-        success = false,
-      } = e,
-      {
-        masked_input: t = masked_input,
-        is_sensitive: l = is_sensitive,
-        original_input: s = original_input,
-        blocked_entities: d = blocked_entities,
-        to_block: g = is_block,
-        masked_entities: h = masked_entities,
-      } = e;
-
-    return l && !g
-      ? new Promise((m) => {
-          const y = (G) => {
-              M(), m(G ? t : s);
-            },
-            f = () => {
-              M(), m(!1);
-            },
-            v = document.createElement("div");
-          document.body.appendChild(v);
-          const M = () => {
-            vt.unmountComponentAtNode(v), document.body.removeChild(v);
-          };
-          vt.render(
-            x.createElement(m_, {
-              isVisible: !0,
-              maskedInput: t,
-              message: s,
-              masked_entities: h,
-              onProceed: y,
-              onBackToEditing: f,
-            }),
-            v
-          );
-        })
-      : g
-      ? new Promise((m) => {
-          const y = () => {
-              v(), m(!1);
-            },
-            f = document.createElement("div");
-          document.body.appendChild(f);
-          const v = () => {
-            vt.unmountComponentAtNode(f), document.body.removeChild(f);
-          };
-          vt.render(x.createElement(h_, { open: !0, handleClose: y }), f);
-        })
-      : success
-      ? s
-      : s;
-  });
-}
-
+  function ud(e) {
+    return gn(this, null, function* () {
+      const {
+          response: n = {
+            masked_input: "",
+            is_sensitive: !1,
+            original_input: "",
+            blocked_labels_found: [],
+            to_block: !1,
+            masked_entities: {}, // ✅ Added masked_entities
+          },
+          success: o = !1,
+        } = e,
+        {
+          masked_input: t = "",
+          is_sensitive: l = !1,
+          original_input: s = "",
+          blocked_labels_found: d = [],
+          to_block: g = !1,
+          masked_entities: h = {}, // ✅ Extract masked_entities
+        } = n;
+      return l && !g
+        ? new Promise((m) => {
+            const y = (G) => {
+                M(), m(G ? t : s);
+              },
+              f = () => {
+                M(), m(!1);
+              },
+              v = document.createElement("div");
+            document.body.appendChild(v);
+            const M = () => {
+              vt.unmountComponentAtNode(v), document.body.removeChild(v);
+            };
+            vt.render(
+              x.createElement(m_, {
+                isVisible: !0,
+                maskedInput: t,
+                message: s,
+                masked_entities: h, // ✅ Pass masked_entities
+                onProceed: y,
+                onBackToEditing: f,
+              }),
+              v
+            );
+          })
+        : g
+        ? new Promise((m) => {
+            const y = () => {
+                v(), m(!1);
+              },
+              f = document.createElement("div");
+            document.body.appendChild(f);
+            const v = () => {
+              vt.unmountComponentAtNode(f), document.body.removeChild(f);
+            };
+            vt.render(x.createElement(h_, { open: !0, handleClose: y }), f);
+          })
+        : o
+        ? s
+        : s
+    });
+  }
+  
 chrome.storage.onChanged.addListener(function () {
   gn(this, null, function* () {
     if (_n.textarea !== null) {
@@ -69990,7 +69953,6 @@ function p_(e, n) {
           o.stopPropagation(), o.preventDefault();
           const t = e == null ? void 0 : e.innerText.trim();
           try {
-            showLoader();
             const l = yield new Promise((s, d) => {
               chrome.runtime.sendMessage(
                 { type: "PROCESS_MESSAGE", message: t },
@@ -69998,7 +69960,6 @@ function p_(e, n) {
                   chrome.runtime.lastError
                     ? d(new Error(chrome.runtime.lastError))
                     : s(g);
-                  hideLoader();
                 }
               );
             });
@@ -70022,12 +69983,11 @@ function p_(e, n) {
               }
             }
           } catch (l) {
-            hideLoader();
             console.error("Error during message processing:", l);
           }
         }
-      });
-    });
+      })
+    })
 }
 function y_(e, n) {
   const o = (t) =>
@@ -70042,7 +70002,6 @@ function y_(e, n) {
         const s = e.innerText.trim();
         try {
           if (s) {
-            showLoader();
             const d = yield new Promise((g, m) => {
               chrome.runtime.sendMessage(
                 { type: "PROCESS_MESSAGE", message: s },
@@ -70050,7 +70009,6 @@ function y_(e, n) {
                   chrome.runtime.lastError
                     ? m(new Error(chrome.runtime.lastError.message))
                     : g(y);
-                  hideLoader();
                 }
               );
             });
@@ -70075,7 +70033,6 @@ function y_(e, n) {
             }
           }
         } catch (d) {
-          hideLoader();
           console.error("Error in keydown handler:", d);
         }
       }
@@ -70133,33 +70090,3 @@ function Uy() {
   });
 }
 Uy();
-
-// content-script.js
-document.addEventListener('change', (event) => {
-  if (event.target && event.target.type === 'file') {
-    const file = event.target.files[0];
-    if (file) {
-      console.log("Selected file:", file.name, "Size:", file.size);
-      const reader = new FileReader();
-      reader.onload = function() {
-        console.log("Read file as ArrayBuffer. Byte length:", reader.result.byteLength);
-        // Convert ArrayBuffer to base64 string
-        const uint8Array = new Uint8Array(reader.result);
-        let binaryString = '';
-        for (let i = 0; i < uint8Array.byteLength; i++) {
-          binaryString += String.fromCharCode(uint8Array[i]);
-        }
-        const base64String = btoa(binaryString);
-        chrome.runtime.sendMessage({
-          type: 'FILE_SELECTED',
-          fileContentBase64: base64String,
-          fileName: file.name,
-          fileType: file.type,
-        });
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  }
-});
-
-

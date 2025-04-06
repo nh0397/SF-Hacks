@@ -90,7 +90,7 @@ function p() {
       "accessToken",
       "user",
     ]);
-    t && e ? m(e) : u();
+    t && e ? m(e.username) : u();
   });
 }
 function u() {
@@ -103,7 +103,7 @@ function m(t) {
     o = document.getElementById("dashboard"),
     s = document.getElementById("username-display");
   e && (e.style.display = "none"),
-    o && ((o.style.display = "block"), (o.style.height = "100%")),
+    o && (o.style.display = "block", o.style.height = "100%"),
     s && (s.innerHTML = t);
 }
 function E(t) {
@@ -125,7 +125,7 @@ function E(t) {
         const r = yield n.json();
         yield chrome.storage.sync.set({
           accessToken: r.access_token,
-          user: r.user.username,
+          user: r.user,
         }),
           m(r.user.username),
           yield D(r.access_token);
@@ -138,59 +138,21 @@ function E(t) {
 function D(t) {
   return i(this, null, function* () {
     try {
-      // Retrieve the user from chrome.storage.sync
-      const userResult = yield new Promise((resolve, reject) => {
-        chrome.storage.sync.get("user", (result) => {
-          if (chrome.runtime.lastError) {
-            reject(chrome.runtime.lastError);
-          } else {
-            resolve(result);
-          }
-        });
-      });
-
-      const user = userResult.user;
-
-      if (!user) {
-        console.error("User not found in storage");
-        return;
-      }
-
-      // Use the retrieved user in the fetch URL
       const e = yield fetch(
-        `http://localhost:5000/policies/${user}`,
+        "http://localhost:5000/policy/list",
         { method: "GET", headers: { Authorization: `Bearer ${t}` } }
       );
-
       if (e.ok) {
         const o = yield e.json();
-        console.log("API List:", o);
-
-        // Send the API list via chrome.runtime.sendMessage
-        yield new Promise((resolve, reject) => {
+        console.log("API List:", o),
           chrome.runtime.sendMessage({ apiList: o }, () => {
-            if (chrome.runtime.lastError) {
+            chrome.runtime.lastError &&
               console.error(
                 "Error sending message:",
                 chrome.runtime.lastError.message
               );
-              reject(chrome.runtime.lastError);
-            } else {
-              resolve();
-            }
           });
-          chrome.tabs.query(
-            { active: true, currentWindow: true },
-            function (tabs) {
-              if (tabs.length > 0) {
-                chrome.tabs.reload(tabs[0].id);
-              }
-            }
-          );
-        });
-      } else {
-        console.error("Failed to fetch API list");
-      }
+      } else console.error("Failed to fetch API list");
     } catch (e) {
       console.error("Error fetching API list:", e);
     }
