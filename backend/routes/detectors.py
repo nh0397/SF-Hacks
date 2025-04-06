@@ -20,7 +20,7 @@ detectors_collection = db.get_collection("detectors")
 
 detector_bp = Blueprint("detector", __name__)
 
-@detector_bp.route('/create_detector', methods=['POST'])
+@detector_bp.route('/create_detector', methods=['POST', 'PUT'])
 @jwt_required()
 def create_detector():
     try:

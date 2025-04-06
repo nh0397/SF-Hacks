@@ -20,7 +20,7 @@ policy_collection = db.get_collection("policies")
 
 policy_bp = Blueprint("policy", __name__)
 
-@policy_bp.route('/create_policy', methods=['POST'])
+@policy_bp.route('/create_policy', methods=['POST', 'PUT'])
 @jwt_required()
 def create_policy():
     try:
