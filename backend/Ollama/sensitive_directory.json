@@ -1,0 +1,16 @@
+{
+    "EMAIL": "Any string that represents an email address. Example: email@example.com",
+    "SSN": "A US Social Security Number in the format XXX-XX-XXXX. Example: 123-45-6789",
+    "PHONE": "US phone number in formats like (XXX) XXX-XXXX or XXX-XXX-XXXX. Example: (312) 555-7890",
+    "CREDIT_CARD": "A credit card number, typically 16 digits formatted with or without spaces. Example: 4539 1488 0343 6467",
+    "ADDRESS": "Home or office address containing street names, numbers, zip code, or city. Example: 123 Elm St., Springfield, IL 62704",
+    "DOB": "Date of birth in formats like MM/DD/YYYY or YYYY-MM-DD. Example: 12/24/1988 or 1988-12-24",
+    "API_KEY": "A secret API key, usually a long alphanumeric string. Example: ABCD1234EFGH5678",
+    "PASSWORD": "A password or passcode often including symbols, digits, and letters. Example: P@ssw0rd!",
+    "BANK_ACCOUNT": "A bank account number, typically a series of digits. Example: 1234567890",
+    "ROUTING_NUMBER": "A bank routing number, typically 9 digits. Example: 021000021",
+    "DRIVER_LICENSE": "A driver's license number. Example: D1234567",
+    "PASSPORT": "A passport number. Example: 123456789",
+    "MEDICAL_ID": "A medical identification number assigned by institutions. Example: M12345678",
+    "INSURANCE_ID": "An insurance policy or member number. Example: INS-123456789"
+  }

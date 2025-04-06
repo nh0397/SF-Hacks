@@ -2,3 +2,38 @@
 env
 *.pyc
 *.python-version
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# VS Code
+.vscode/
+
+# macOS system files
+.DS_Store
+
+# Python environment and packaging
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Logs and local configs
+*.log
+*.env
+*.local
+*.db
+*.sqlite3
+
+# Ollama model cache (if any)
+ollama_cache/
+
+*./venv
+backend/venv/
