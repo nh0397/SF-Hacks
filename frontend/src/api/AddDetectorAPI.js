@@ -5,7 +5,7 @@ export const addDetectorAPI = async (detectorData) => {
     const { username,name, ...payload } = detectorData;
 
     // For example: PUT /policy/detector/5
-    const response = await apiClient.put(`/detectors/${username}/${name}`, payload);
+    const response = await apiClient.put(`/detectors/create_detector`, payload);
     return response.data;
   } catch (error) {
     console.error("Updating detector failed:", error);

@@ -1,6 +1,7 @@
 import axios from "axios";
-import API_BASE_URL from "../config";
 import { getSecureToken } from "../utils/security";
+
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -10,18 +11,18 @@ const apiClient = axios.create({
   },
 });
 
-// Add a request interceptor to attach token
-apiClient.interceptors.request.use(async (config) => {
-  const token = getSecureToken();
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+// ✅ Auto-attach token from sessionStorage
+apiClient.interceptors.request.use(
+  async (config) => {
+    const token = getSecureToken();
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// Handle API errors globally
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

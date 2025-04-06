@@ -1,8 +1,9 @@
+// src/pages/Policies/Policies.jsx
 import React, { useState, useEffect } from "react";
 import { Button, Switch, Snackbar, Alert } from "@mui/material";
 import "./Policies.css";
 import { useSidebar } from "../../context/SidebarContext";
-import PolicyModal from "../PolicyModal/PolicyModal"; // Import the PolicyModal component
+import PolicyModal from "../PolicyModal/PolicyModal";
 import { addPolicyAPI } from "../../api/AddPoliciesAPI";
 import { fetchAllPolicies } from "../../api/FetchAllPolicies";
 import { fetchAllDetectors } from "../../api/FetchAllDetectors";
@@ -15,13 +16,12 @@ const Policies = () => {
   const [sortField, setSortField] = useState("policy_name");
   const [sortDirection, setSortDirection] = useState("asc");
   const [expandedRow, setExpandedRow] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false); // Modal state
-  const [formData, setFormData] = useState(null); // To store form data for validation
+  const [modalOpen, setModalOpen] = useState(false);
+  const [formData, setFormData] = useState(null);
   const [username, setUsername] = useState("");
   const [detectors, setDetectors] = useState([]);
   const [policies, setPolicies] = useState([]);
 
-  // Combined snackbar state for both add and delete notifications.
   const [snackBar, setSnackBar] = useState({
     open: false,
     message: "",
@@ -30,22 +30,18 @@ const Policies = () => {
 
   const userContext = useAuth();
 
-  // Helper function to show snackbar
   const showSnackbar = (message, severity = "success") => {
     setSnackBar({ open: true, message, severity });
   };
 
-  // Close snackbar
   const closeSnackbar = () => {
     setSnackBar({ ...snackBar, open: false });
   };
 
-  // Handle search
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Handle sorting
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -55,21 +51,18 @@ const Policies = () => {
     }
   };
 
-  // Handle row click to expand
   const handleRowClick = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
   };
 
-  // Handle status toggle
   const handleStatusToggle = (id, newStatus) => {
     setPolicies(
       policies.map((policy) =>
-        policy.id === id ? { ...policy, status: newStatus } : policy
+        (policy._id || policy.id) === id ? { ...policy, status: newStatus } : policy
       )
     );
   };
 
-  // Function to validate form data
   const isFormValid = (data) => {
     if (!data.policy_name || !data.policy_name.trim()) return false;
     if (!data.description || !data.description.trim()) return false;
@@ -82,15 +75,18 @@ const Policies = () => {
     return true;
   };
 
-  // Function to update form data for validation
   const handleFormUpdate = (data) => {
     setFormData(data);
     console.log("Form data updated:", data);
   };
 
-  // Function to add new policy from modal data
   const handleAddPolicy = async (newPolicy) => {
     console.log("Adding new policy:", newPolicy);
+    if (!newPolicy.policy_name) {
+      console.error("❌ Missing policy_name in newPolicy. Check modal form input.");
+      return;
+    }
+    console.log("✅ Submitting new policy object:", newPolicy);
     const now = new Date().toISOString().split("T")[0];
     newPolicy.username = sessionStorage.getItem("username");
     newPolicy.id = policies.length + 1;
@@ -100,7 +96,7 @@ const Policies = () => {
     newPolicy.status = true;
     const createdPolicy = await addPolicyAPI(newPolicy);
     if (createdPolicy) {
-      setPolicies([...policies, newPolicy]);
+      setPolicies([...policies, createdPolicy]);
       setModalOpen(false);
       setFormData(null);
       showSnackbar("Policy Added Successfully!", "success");
@@ -108,8 +104,6 @@ const Policies = () => {
     }
   };
 
-  // Function to delete a policy using the DeletePolicyAPI.
-  // The click event is passed to stop propagation so that the row doesn't toggle.
   const handleDeletePolicy = async (username, policyName, e) => {
     if (e) e.stopPropagation();
     try {
@@ -131,21 +125,28 @@ const Policies = () => {
       : sessionStorage.getItem("username");
     setUsername(uname);
     fetchAllPolicies(uname).then((policyList) => {
+      console.log("Policy list from API:", policyList);
+      // Assuming policyList is an array
       setPolicies(policyList || []);
     });
     fetchAllDetectors(uname).then((detectorList) => {
-      setDetectors(detectorList || []);
+      setDetectors(detectorList?.detectors || []);
     });
   }, [userContext.username]);
 
-  const filteredPolicies = policies.filter(
-    (policy) =>
-      policy.policy_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      policy.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      policy.detectors.some((detector) =>
-        detector.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPolicies = policies.filter((policy) => {
+    const name = policy.policy_name || "";
+    const description = policy.description || "";
+    const detectorsArr = Array.isArray(policy.detectors) ? policy.detectors : [];
+  
+    return (
+      name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      detectorsArr.some((detector) =>
+        (detector || "").toLowerCase().includes(searchTerm.toLowerCase())
       )
-  );
+    );
+  });
 
   const sortedPolicies = [...filteredPolicies].sort((a, b) => {
     if (sortDirection === "asc") {
@@ -237,10 +238,12 @@ const Policies = () => {
               </thead>
               <tbody>
                 {sortedPolicies.map((policy) => (
-                  <React.Fragment key={policy.id}>
+                  <React.Fragment key={policy._id || policy.id}>
                     <tr
-                      className={expandedRow === policy.id ? "row-expanded" : ""}
-                      onClick={() => handleRowClick(policy.id)}
+                      className={
+                        expandedRow === (policy._id || policy.id) ? "row-expanded" : ""
+                      }
+                      onClick={() => handleRowClick(policy._id || policy.id)}
                     >
                       <td>{policy.policy_name}</td>
                       <td>{policy.description}</td>
@@ -257,14 +260,14 @@ const Policies = () => {
                         <Switch
                           checked={policy.status}
                           onChange={(e) =>
-                            handleStatusToggle(policy.id, e.target.checked)
+                            handleStatusToggle(policy._id || policy.id, e.target.checked)
                           }
                           color="primary"
                           size="small"
                         />
                       </td>
                     </tr>
-                    {expandedRow === policy.id && (
+                    {expandedRow === (policy._id || policy.id) && (
                       <tr className="expanded-info">
                         <td colSpan="4">
                           <div className="expanded-content">
@@ -293,8 +296,7 @@ const Policies = () => {
                                 <span className="detail-label">Status:</span>
                                 <span className="detail-value">
                                   <span
-                                    className={`status-indicator ${policy.status ? "active" : "inactive"
-                                      }`}
+                                    className={`status-indicator ${policy.status ? "active" : "inactive"}`}
                                   ></span>
                                   {policy.status ? "Active" : "Inactive"}
                                 </span>
@@ -347,7 +349,10 @@ const Policies = () => {
       <PolicyModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSave={handleAddPolicy}
+        onSave={(formValues) => {
+          console.log("🧪 PolicyModal returned:", formValues);
+          handleAddPolicy({ ...formValues });
+        }}
         detectors={detectors}
         onUpdate={handleFormUpdate}
         isValid={formData ? isFormValid(formData) : false}

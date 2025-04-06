@@ -1,4 +1,4 @@
-// PolicyModal.jsx
+// src/pages/PolicyModal/PolicyModal.jsx
 import React, { useState, useEffect } from "react";
 import { TextField, MenuItem, Switch, FormControlLabel, Box, Select, FormControl, InputLabel } from "@mui/material";
 import ModalWrapper from "../../components/ModalWrapper/ModalWrapper";
@@ -6,16 +6,11 @@ import ModalWrapper from "../../components/ModalWrapper/ModalWrapper";
 const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) => {
   const [policy_name, setName] = useState("");
   const [description, setDescription] = useState("");
-  // Using array of detector names for selected detectors
   const [selectedDetectors, setSelectedDetectors] = useState([]);
-  // Add threshold state for each detector
   const [thresholds, setThresholds] = useState({});
-  // Add action state
   const [action, setAction] = useState("Audit");
-  // Add selected users/groups state
   const [selectedUsers, setSelectedUsers] = useState([]);
 
-  // Static user groups
   const userGroups = [
     "securealley@all",
     "securealley@frontend",
@@ -24,24 +19,34 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
     "securealley@management"
   ];
 
-  // Compile form data for validation and saving
-  const formData = {
-    policy_name,
-    description,
-    detectors: selectedDetectors,
-    thresholds,
-    action,
-    users: selectedUsers
+  // Save handler captures the current state
+  const handleSave = () => {
+    const currentFormData = {
+      policy_name,
+      description,
+      detectors: selectedDetectors,
+      thresholds,
+      action,
+      users: selectedUsers
+    };
+    console.log("Form data to be saved:", currentFormData);
+    onSave(currentFormData);
   };
 
-  // Update parent component with form data for validation
   useEffect(() => {
     if (onUpdate) {
-      onUpdate(formData);
+      const currentFormData = {
+        policy_name,
+        description,
+        detectors: selectedDetectors,
+        thresholds,
+        action,
+        users: selectedUsers
+      };
+      onUpdate(currentFormData);
     }
   }, [policy_name, description, selectedDetectors, thresholds, action, selectedUsers]);
 
-  // Reset form when modal is closed
   useEffect(() => {
     if (!open) {
       setName("");
@@ -53,14 +58,10 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
     }
   }, [open]);
 
-  // Handler for when a detector is chosen from the select dropdown
   const handleDetectorChange = (e) => {
     const { value } = e.target;
-    // Since value is an array in multiple mode, we update our state accordingly
     const newSelectedDetectors = typeof value === "string" ? value.split(",") : value;
     setSelectedDetectors(newSelectedDetectors);
-
-    // Initialize thresholds for newly selected detectors
     const newThresholds = { ...thresholds };
     newSelectedDetectors.forEach(detector => {
       if (!newThresholds[detector]) {
@@ -70,17 +71,6 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
     setThresholds(newThresholds);
   };
 
-  // Handler to remove a selected detector
-  const handleDeleteDetector = (detectorName) => {
-    setSelectedDetectors(selectedDetectors.filter((name) => name !== detectorName));
-
-    // Remove threshold for deleted detector
-    const newThresholds = { ...thresholds };
-    delete newThresholds[detectorName];
-    setThresholds(newThresholds);
-  };
-
-  // Handler for threshold changes
   const handleThresholdChange = (detector, value) => {
     setThresholds({
       ...thresholds,
@@ -88,19 +78,9 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
     });
   };
 
-  // Handler for user/group selection
   const handleUserGroupChange = (e) => {
     const { value } = e.target;
     setSelectedUsers(typeof value === "string" ? value.split(",") : value);
-  };
-
-  // Save handler with console logging
-  const handleSave = () => {
-    // Log the form data
-    console.log("Form data to be saved:", formData);
-
-    // Call the parent's save handler
-    onSave(formData);
   };
 
   return (
@@ -112,7 +92,7 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
       saveDisabled={!isValid}
     >
       <TextField
-        label="Name"
+        label="Policy Name"
         value={policy_name}
         onChange={(e) => setName(e.target.value)}
         fullWidth
@@ -142,14 +122,12 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
           renderValue: (selected) => selected.join(", "),
         }}
       >
-        {detectors.map((detector) => (
-          <MenuItem key={detector.id} value={detector.detector_name}>
+        {detectors.map((detector, index) => (
+          <MenuItem key={detector.id || detector.detector_name || index} value={detector.detector_name}>
             {detector.detector_name}
           </MenuItem>
         ))}
       </TextField>
-
-      {/* Threshold input fields for selected detectors */}
       {selectedDetectors.length > 0 && (
         <Box
           sx={{
@@ -178,8 +156,6 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
           ))}
         </Box>
       )}
-
-      {/* Action selection */}
       <FormControl fullWidth margin="normal" required>
         <InputLabel>Policy Action</InputLabel>
         <Select
@@ -192,8 +168,6 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
           <MenuItem value="Mask">Mask</MenuItem>
         </Select>
       </FormControl>
-
-      {/* User/User Group selection */}
       <TextField
         select
         label="Select Users/Groups"
@@ -213,11 +187,10 @@ const PolicyModal = ({ open, onClose, onSave, detectors, onUpdate, isValid }) =>
           </MenuItem>
         ))}
       </TextField>
-
       <FormControlLabel
         control={
           <Switch
-            checked={true} // Dummy default
+            checked={true}
             color="primary"
           />
         }

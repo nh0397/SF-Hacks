@@ -65,7 +65,7 @@ const Detectors = () => {
       // Call the API to add the detector
       const createdDetector = await addDetectorAPI(newDetector);
       if (createdDetector) {
-        setDetectors([...detectors, newDetector]);
+        setDetectors([...(Array.isArray(detectors) ? detectors : []), newDetector]);
         setModalOpen(false);
         showSnackbar("Detector added successfully!", "success");
         console.log("New detector added successfully:", createdDetector);
@@ -81,19 +81,22 @@ const Detectors = () => {
     const uname = userContext.username
       ? userContext.username
       : sessionStorage.getItem("username");
+  
     setUsername(uname);
+  
     fetchAllDetectors(uname).then((detectorList) => {
-      setDetectors(detectorList || []);
+      console.log("🔍 Response from fetchAllDetectors:", detectorList); // ✅ Add this line
+      setDetectors(detectorList?.detectors || []);
+      setSearchTerm("");
     });
   }, [userContext.username]);
 
   // Optimized filtering using useMemo
   const filteredDetectors = useMemo(() => {
-    return detectors.filter((detector) =>
-      (detector.detector_name ? detector.detector_name.toLowerCase() : "")
-        .includes(searchTerm.toLowerCase()) ||
-      (detector.detector_type ? detector.detector_type.toLowerCase() : "")
-        .includes(searchTerm.toLowerCase())
+    console.log("📦 detectors before filtering:", detectors);
+    return (Array.isArray(detectors) ? detectors : []).filter((detector) =>
+      (detector.detector_name ? detector.detector_name.toLowerCase() : "").includes(searchTerm.toLowerCase()) ||
+      (detector.detector_type ? detector.detector_type.toLowerCase() : "").includes(searchTerm.toLowerCase())
     );
   }, [detectors, searchTerm]);
 
@@ -127,8 +130,8 @@ const Detectors = () => {
   // Delete detector handler updated with combined snackbar notifications
   const handleDeleteDetector = async (detectorName, username) => {
     try {
-      // Pass policy_name as detectorName to match your API expectation
-      const result = await DeleteDetectorAPI({ username, detectorName });
+      // Pass policy_name as detector_name to match your API expectation
+      const result = await DeleteDetectorAPI({ username, detector_name: detectorName });
       // Remove the deleted detector from the state.
       setDetectors(detectors.filter(detector => detector.detector_name !== detectorName));
       showSnackbar("Detector deleted successfully.", "success");

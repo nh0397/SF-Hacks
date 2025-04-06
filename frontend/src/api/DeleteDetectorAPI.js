@@ -1,11 +1,17 @@
-import apiClient from "./apiClient"; 
+import apiClient from "./apiClient";
 
 export const DeleteDetectorAPI = async (detectorData) => {
   try {
-    const { username,detectorName } = detectorData;
+    const { username, detector_name } = detectorData;
 
-    // For example: PUT /policy/detector/5
-    const response = await apiClient.delete(`/detectors/${username}/${detectorName}`);
+    // Explicitly pass body & headers
+    const response = await apiClient.delete("/detectors/delete_detector", {
+      data: { username, detector_name },
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
     return response.data;
   } catch (error) {
     console.error("Deleting Detector Failed:", error);
