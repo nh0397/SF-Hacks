@@ -19,7 +19,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username:"",
+    username: "",
     email: "",
     password: "",
     first_name: "",
@@ -37,7 +37,7 @@ export default function Signup() {
     if (response) {
       setSnackBarOpen(true)
       navigate("/login");
-    
+
       // Optionally navigate after a delay or after snackbar closes
     }
   };
@@ -51,7 +51,7 @@ export default function Signup() {
     <div className="signup-container">
       <div className="signup-left">
         <Typography variant="h6" className="tagline">
-          Enabling enterprises to institutionalize data-driven decision making
+          Preserving Data, Building Trust!
         </Typography>
       </div>
 
@@ -141,7 +141,7 @@ export default function Signup() {
           open={snackBarOpen}
           autoHideDuration={6000}
           onClose={closeSnackbar}
-          anchorOrigin={{vertical : 'top', horizontal:'center'}}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         >
           <Alert
             onClose={closeSnackbar}

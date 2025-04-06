@@ -21,11 +21,11 @@ export default function Login() {
     e.preventDefault();
     try {
       const response = await loginAPI(formData);
-      
+
       // Call the AuthContext login method with the returned user data.
       // Adjust the property names based on your API response.
       login({ username: response.username || (response.user && response.user.username) });
-      
+
       // Optionally store the username in sessionStorage if needed.
       sessionStorage.setItem("username", response.username || (response.user && response.user.username));
 
@@ -39,7 +39,7 @@ export default function Login() {
     <div className="login-container">
       <div className="login-left">
         <Typography variant="h6" className="tagline">
-          Enabling enterprises to institutionalize data-driven decision making
+          Preserving Data, Building Trust!
         </Typography>
       </div>
 
