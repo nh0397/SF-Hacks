@@ -13,7 +13,7 @@ import ModalWrapper from "../../components/ModalWrapper/ModalWrapper";
 const DetectorModal = ({ open, onClose, onSave }) => {
   const [detector_name, setName] = useState("");
   const [detector_type, setType] = useState("");
-  const [regexPattern, setRegexPattern] = useState("");
+  const [regex_pattern, setRegexPattern] = useState("");
   const [regexValid, setRegexValid] = useState(true);
   // Keywords stored as an array
   const [keywords, setKeywords] = useState([]);
@@ -95,7 +95,7 @@ const DetectorModal = ({ open, onClose, onSave }) => {
   // Determine if form is valid based on selected detector_type.
   const isFormValid = () => {
     if (!detector_name.trim() || !detector_type) return false;
-    if (detector_type === "regex") return regexPattern.trim() && regexValid;
+    if (detector_type === "regex") return regex_pattern.trim() && regexValid;
     if (detector_type === "keywords") return keywords.length > 0;
     if (detector_type === "ml_based") return description.trim();
     return true;
@@ -105,7 +105,7 @@ const DetectorModal = ({ open, onClose, onSave }) => {
     const payload = {
       detector_name,
       detector_type,
-      regexPattern,
+      regex_pattern,
       keywords, // array of keywords
       description,
     };
@@ -147,7 +147,7 @@ const DetectorModal = ({ open, onClose, onSave }) => {
         <>
           <TextField
             label="Regex Pattern"
-            value={regexPattern}
+            value={regex_pattern}
             onChange={handleRegexChange}
             fullWidth
             margin="normal"
