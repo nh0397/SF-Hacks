@@ -1,19 +1,26 @@
-import { createContext, useContext, useState } from "react";
-import { getSecureToken, setSecureToken, removeSecureToken } from "../utils/security";
+import React, { createContext, useState, useEffect, useContext } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const login = (token) => {
-    setSecureToken(token);
-    setUser({ token });
+  // Load user data from sessionStorage when the app starts
+  useEffect(() => {
+    const savedUser = sessionStorage.getItem("username");
+    if (savedUser) {
+      setUser({ username: savedUser });
+    }
+  }, []);
+
+  const login = (userData) => {
+    setUser(userData);
+    sessionStorage.setItem("username", userData.username); // ✅ Store in sessionStorage
   };
 
   const logout = () => {
-    removeSecureToken();
     setUser(null);
+    sessionStorage.clear(); // ✅ Clear sessionStorage on logout
   };
 
   return (

@@ -4,7 +4,7 @@ import { getSecureToken } from "../utils/security";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 5000,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },

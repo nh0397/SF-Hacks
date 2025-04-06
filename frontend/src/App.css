@@ -36,3 +36,70 @@
     transform: rotate(360deg);
   }
 }
+
+/* App container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Navbar */
+.navbar {
+  height: 64px;
+  background-color: #0047AB;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* Content Wrapper */
+.content-container {
+  display: flex;
+  flex-grow: 1;
+  padding-top: 64px; /* Ensure content starts below navbar */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 256px;
+  height: calc(100vh - 64px);
+  background-color: white;
+  transition: width 0.3s ease-in-out;
+  border-right: 1px solid #ddd;
+  position: fixed;
+  left: 0;
+  top: 64px;
+  overflow: hidden;
+}
+
+/* Sidebar Collapsed */
+.sidebar-collapsed .sidebar {
+  width: 64px;
+}
+
+/* Main Content */
+.main-content {
+  flex-grow: 1;
+  margin-left: 256px;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f4f6f8;
+  transition: margin-left 0.3s ease-in-out;
+  width: 100%;
+  box-sizing: border-box;
+  height: 92vh;
+  overflow: hidden;
+
+}
+
+/* Adjust when sidebar is collapsed */
+.sidebar-collapsed .main-content {
+  margin-left: 64px;
+}

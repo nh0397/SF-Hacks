@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TextField, Button, IconButton, InputAdornment, Typography, Box } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import "./Signup.css";
@@ -7,6 +7,7 @@ import logo from "../../assets/logo.png";
 import { signupAPI } from "../../api/SignupAPI";
 
 export default function Signup() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ username: "", email: "", password: "" });
 
@@ -16,7 +17,8 @@ export default function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    signupAPI(formData);
+    signupAPI(formData)
+    .then(() => navigate("/login"))
   };
 
   return (
