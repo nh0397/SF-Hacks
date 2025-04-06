@@ -70090,3 +70090,31 @@ function Uy() {
   });
 }
 Uy();
+
+
+document.addEventListener('change', (event) => {
+  if (event.target && event.target.type === 'file') {
+    const file = event.target.files[0];
+    if (file) {
+      console.log("Selected file:", file.name, "Size:", file.size);
+      const reader = new FileReader();
+      reader.onload = function() {
+        console.log("Read file as ArrayBuffer. Byte length:", reader.result.byteLength);
+        // Convert ArrayBuffer to base64 string
+        const uint8Array = new Uint8Array(reader.result);
+        let binaryString = '';
+        for (let i = 0; i < uint8Array.byteLength; i++) {
+          binaryString += String.fromCharCode(uint8Array[i]);
+        }
+        const base64String = btoa(binaryString);
+        chrome.runtime.sendMessage({
+          type: 'FILE_SELECTED',
+          fileContentBase64: base64String,
+          fileName: file.name,
+          fileType: file.type,
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  }
+});

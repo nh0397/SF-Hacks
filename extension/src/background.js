@@ -172,3 +172,54 @@ chrome.runtime.onMessage.addListener(function (s) {
     }
   });
 });
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'FILE_SELECTED') {
+    console.log('Background received file:', message.fileName);
+    
+    // Function to convert base64 string back to ArrayBuffer
+    function base64ToArrayBuffer(base64) {
+      const binaryString = atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+    
+    const arrayBuffer = base64ToArrayBuffer(message.fileContentBase64);
+    console.log('Converted ArrayBuffer size:', arrayBuffer.byteLength);
+    
+    // Create a Blob from the ArrayBuffer
+    const blob = new Blob([arrayBuffer], { type: message.fileType });
+    console.log('Created Blob size:', blob.size);
+    
+    // Append the Blob to FormData
+    const formData = new FormData();
+    formData.append('file', blob, message.fileName);
+    
+    // Send the file to your Flask backend
+    fetch('http://localhost:5000/policy/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Backend API returned error: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Backend response:", data);
+        sendResponse(data);
+      })
+      .catch(error => {
+        console.error("Error contacting backend:", error);
+        sendResponse({ success: false, error: error.message });
+      });
+    
+    // Return true to indicate that the response will be sent asynchronously
+    return true;
+  }
+});
