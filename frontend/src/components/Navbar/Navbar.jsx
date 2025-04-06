@@ -8,10 +8,13 @@ import logo from "../../assets/logo.png"
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [username, setUserName] = useState("Username");
   const navigate = useNavigate();
 
   // Add shadow when scrolled
   useEffect(() => {
+    sessionStorage.getItem('username') ? setUserName(sessionStorage.getItem('username')) : setUserName("username")
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -41,7 +44,7 @@ const Navbar = () => {
       <div className="navbar-logo">
         <div className="logo-container">
           <div className="logo-icon" >
-            <img src={logo} className='logo'/>
+            <img src={logo} className='logo' />
           </div>
           <span className="logo-text">Secure Alley</span>
         </div>
@@ -50,9 +53,9 @@ const Navbar = () => {
       {/* Search Bar */}
       <div className="search-container">
         <Search className="search-icon" size={18} />
-        <input 
-          type="text" 
-          placeholder="Search..." 
+        <input
+          type="text"
+          placeholder="Search..."
           className="search-input"
         />
       </div>
@@ -68,13 +71,13 @@ const Navbar = () => {
         {/* Profile Dropdown */}
         <div className="profile-container" onClick={handleProfileMenuOpen}>
           <div className="profile-image">
-            <img 
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=60&q=80" 
-              alt="Profile" 
+            <img
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=60&q=80"
+              alt="Profile"
             />
           </div>
           <div className="profile-info">
-            <p className="profile-name">Archit D</p>
+            <p className="profile-name">{username}</p>
           </div>
           <ChevronDown size={16} className="profile-chevron" />
         </div>
