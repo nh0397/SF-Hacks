@@ -90,7 +90,7 @@ function p() {
       "accessToken",
       "user",
     ]);
-    t && e ? m(e.username) : u();
+    t && e ? m(e) : u();
   });
 }
 function u() {
@@ -103,7 +103,7 @@ function m(t) {
     o = document.getElementById("dashboard"),
     s = document.getElementById("username-display");
   e && (e.style.display = "none"),
-    o && (o.style.display = "block", o.style.height = "100%"),
+    o && ((o.style.display = "block"), (o.style.height = "100%")),
     s && (s.innerHTML = t);
 }
 function E(t) {
@@ -114,7 +114,7 @@ function E(t) {
       s = { username: o.get("username"), password: o.get("password") };
     try {
       const n = yield fetch(
-        "http://localhost:5000/auth/login",
+        "http://127.0.0.1:8000/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -125,10 +125,11 @@ function E(t) {
         const r = yield n.json();
         yield chrome.storage.sync.set({
           accessToken: r.access_token,
-          user: r.user,
+          user: r.user.username,
         }),
           m(r.user.username),
           yield D(r.access_token);
+          window.location.reload()
       } else console.error("Login failed");
     } catch (n) {
       console.error("Error:", n);
@@ -138,29 +139,69 @@ function E(t) {
 function D(t) {
   return i(this, null, function* () {
     try {
+      // Retrieve the user from chrome.storage.sync
+      const userResult = yield new Promise((resolve, reject) => {
+        chrome.storage.sync.get("user", (result) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(result);
+          }
+        });
+      });
+
+      const user = userResult.user;
+
+      if (!user) {
+        console.error("User not found in storage");
+        return;
+      }
+
+      // Use the retrieved user in the fetch URL
       const e = yield fetch(
-        "http://localhost:5000/policy/list",
+        `http://127.0.0.1:8000/policy/list_policies`,
         { method: "GET", headers: { Authorization: `Bearer ${t}` } }
       );
+
       if (e.ok) {
         const o = yield e.json();
-        console.log("API List:", o),
+        console.log("API List:", o);
+
+        // Send the API list via chrome.runtime.sendMessage
+        yield new Promise((resolve, reject) => {
           chrome.runtime.sendMessage({ apiList: o }, () => {
-            chrome.runtime.lastError &&
+            if (chrome.runtime.lastError) {
               console.error(
                 "Error sending message:",
                 chrome.runtime.lastError.message
               );
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
           });
-      } else console.error("Failed to fetch API list");
+          chrome.tabs.query(
+            { active: true, currentWindow: true },
+            function (tabs) {
+              if (tabs.length > 0) {
+                chrome.tabs.reload(tabs[0].id);
+              }
+            }
+          );
+        });
+      } else {
+        console.error("Failed to fetch API list");
+      }
     } catch (e) {
       console.error("Error fetching API list:", e);
     }
   });
 }
 function L() {
+  window.location.reload()
   chrome.storage.sync.remove(["accessToken", "user"], () => {
     u();
+   
   });
 }
 function T() {

@@ -39,9 +39,9 @@ chrome.runtime.onMessage.addListener(function (s, o, e) {
   var c, a, n;
   if ((console.log(s, "request in background"), s.apiList))
     return (
-      (g = (c = s.apiList) == null ? void 0 : c.policies),
+      (g = (c = s.apiList) == null ? void 0 : c),
       chrome.storage.local.set(
-        { apiList: (a = s.apiList) == null ? void 0 : a.policies },
+        { apiList: (a = s.apiList) == null ? void 0 : a },
         () => {
           console.log("API List stored in Chrome storage.");
         }
@@ -59,18 +59,19 @@ chrome.runtime.onMessage.addListener(function (s, o, e) {
       chrome.storage.sync.get(["accessToken", "user"], function (t) {
         return u(this, null, function* () {
           const l = t.accessToken;
+          const user = t.user;
           if (!l) {
             console.log("User is not logged in, accessToken not found."),
-              e({ success: !0, response:{original_input:i} });
+              e({ success: !0, response: { original_input: i } });
             return;
           }
           try {
             const d = yield fetch(
-              "http://localhost:5000/masking/mask",
+              `http://127.0.0.1:8000/masking/mask`,
               {
                 method: "POST",
                 headers: {
-                  Authorization: `Bearer ${l}`,
+                  "Authorization": `Bearer ${l}`,
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -83,7 +84,7 @@ chrome.runtime.onMessage.addListener(function (s, o, e) {
               throw new Error(`Backend API returned error: ${d.statusText}`);
             const h = yield d.json();
             console.log("Backend response:", h),
-            e(h),
+              e(h),
               chrome.storage.sync.set({ totalDetections: 3 }, () => {
                 console.log("Total detections set to 3.");
               });
@@ -103,24 +104,50 @@ chrome.runtime.onMessage.addListener(function (s, o, e) {
 function m(s) {
   return u(this, null, function* () {
     try {
+      // Retrieve the user from chrome.storage.sync
+      const userResult = yield new Promise((resolve, reject) => {
+        chrome.storage.sync.get("user", (result) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(result);
+          }
+        });
+      });
+
+      const user = userResult.user;
+
+      if (!user) {
+        console.error("User not found in storage");
+        return;
+      }
+
+      // Use the retrieved user in the fetch URL
       const o = yield fetch(
-        "http://localhost:5000/policy/list",
-        { method: "GET", headers: { Authorization: `Bearer ${s}` } }
+        `http://127.0.0.1:8000/policy/list_policies`,
+        { method: "GET" }
       );
+
       if (o) {
         const e = yield o.json();
-        e != null &&
-          e.policies &&
-          (console.log("API List fetched:", e),
-          (g = e == null ? void 0 : e.policies),
-          chrome.storage.local.set(
-            { apiList: e == null ? void 0 : e.policies },
-            () => {
-              console.log("API List stored in Chrome storage.");
-            }
-          ));
+        if (e != null && e) {
+          console.log("API List fetched:", e);
+          g = e == null ? void 0 : e;
+          yield new Promise((resolve, reject) => {
+            chrome.storage.local.set({ apiList: e }, () => {
+              if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+              } else {
+                console.log("API List stored in Chrome storage.");
+                resolve();
+              }
+            });
+          });
+        }
         return;
-      } else console.error("Failed to fetch API list");
+      } else {
+        console.error("Failed to fetch API list");
+      }
     } catch (o) {
       console.error("Error fetching API list:", o);
     }
@@ -131,11 +158,14 @@ chrome.runtime.onMessage.addListener((s, o, e) => {
     const { username: c, password: a } = s.formData,
       n = { username: c, password: a };
     try {
-      fetch("http://localhost:5000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(n),
-      })
+      fetch(
+        "http://127.0.0.1:8000/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(n),
+        }
+      )
         .then((r) => {
           r
             ? r
@@ -143,10 +173,10 @@ chrome.runtime.onMessage.addListener((s, o, e) => {
                 .then((t) => {
                   chrome.storage.sync.set({
                     accessToken: t.access_token,
-                    user: t.user,
+                    user: t.user.username,
                   }),
                     m(t.access_token),
-                    e({ success: !0, user: t.user });
+                    e({ success: !0, user: t.user.username });
                 })
                 .catch((t) => {
                   console.error("Error parsing JSON:", t),
@@ -171,55 +201,4 @@ chrome.runtime.onMessage.addListener(function (s) {
       yield chrome.storage.sync.set({ [o]: !c });
     }
   });
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'FILE_SELECTED') {
-    console.log('Background received file:', message.fileName);
-    
-    // Function to convert base64 string back to ArrayBuffer
-    function base64ToArrayBuffer(base64) {
-      const binaryString = atob(base64);
-      const len = binaryString.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      return bytes.buffer;
-    }
-    
-    const arrayBuffer = base64ToArrayBuffer(message.fileContentBase64);
-    console.log('Converted ArrayBuffer size:', arrayBuffer.byteLength);
-    
-    // Create a Blob from the ArrayBuffer
-    const blob = new Blob([arrayBuffer], { type: message.fileType });
-    console.log('Created Blob size:', blob.size);
-    
-    // Append the Blob to FormData
-    const formData = new FormData();
-    formData.append('file', blob, message.fileName);
-    
-    // Send the file to your Flask backend
-    fetch('http://localhost:5000/policy/upload', {
-      method: 'POST',
-      body: formData,
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Backend API returned error: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Backend response:", data);
-        sendResponse(data);
-      })
-      .catch(error => {
-        console.error("Error contacting backend:", error);
-        sendResponse({ success: false, error: error.message });
-      });
-    
-    // Return true to indicate that the response will be sent asynchronously
-    return true;
-  }
 });
