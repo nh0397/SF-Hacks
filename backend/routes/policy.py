@@ -8,6 +8,7 @@ import os
 from models.model import MongoDB
 from bson.objectid import ObjectId
 import json
+from loguru import logger
 
 load_dotenv()
 
@@ -67,9 +68,10 @@ def list_policies():
     try:
         # Get the current user from JWT
         user_id = get_jwt_identity()
-
+        logger.debug(f"User ID: {user_id}")
         # Find all policies for the user
         policies = list(policy_collection.find({"user_id": user_id}))
+        logger.debug(f"Policies found: {policies}")
 
         # Convert ObjectId to string for JSON serialization
         for policy in policies:
