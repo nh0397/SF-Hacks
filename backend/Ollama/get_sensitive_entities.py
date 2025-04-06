@@ -1,4 +1,4 @@
-from extract_entities import batch_process
+from Ollama.extract_entities import batch_process
 import json
 
 def compare_entities(user_entities, directory_entities):
@@ -32,7 +32,7 @@ def pretty_print_entities(entities):
                     print(f"    Confidence: {item['confidence']:.2f}")
     print("\n" + "="*30 + "\n")
 
-def get_sensitive_entities(input_text, user_sensitive_definitions, sensitive_directory_path="backend/Ollama/sensitive_directory.json"):
+def get_sensitive_entities(input_text, user_sensitive_definitions, sensitive_directory_path="Ollama/sensitive_directory.json"):
     """
     Extracts sensitive entities from input text using both user-defined and directory definitions.
     

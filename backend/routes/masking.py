@@ -1,4 +1,4 @@
-from extractors.main_masking_ext import Masking
+from extractors.masking_main import Masking
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from pymongo import MongoClient

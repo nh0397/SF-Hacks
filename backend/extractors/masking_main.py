@@ -1,8 +1,8 @@
 from typing import List, Dict
 from loguru import logger
-from backend.Ollama.get_sensitive_entities import get_sensitive_entities
-from regex_extractor import SensitiveDataMasker
-from keywords_extractor import SensitiveKeywordMasker
+from Ollama.get_sensitive_entities import get_sensitive_entities
+from extractors.regex_extractor import SensitiveDataMasker
+from extractors.keywords_extractor import SensitiveKeywordMasker
 import re
 import json
 from copy import deepcopy
@@ -143,8 +143,8 @@ class Masking:
         for key, values in merged_dict.items():
             for i, value in enumerate(values, start=1):
                 # ensure we only keep keys that match our output format
-                if key in self.output_format_keys:
-                    numbered_dict[f"{key}_{i}"] = value
+                # if key in self.output_format_keys:
+                numbered_dict[f"{key}_{i}"] = value
         return numbered_dict
 
     def replace_entities_in_text(self, user_input: str, numbered_entities: dict) -> str:
@@ -184,9 +184,9 @@ class Masking:
 
             # Postprocess the ML output to ensure valid JSON   
             try:
-                ml_out = self.postprocess_response(ml_out)
-                if isinstance(ml_out, str):
-                    ml_out = json.loads(ml_out)
+                # ml_out = self.postprocess_response(ml_out)
+                # if isinstance(ml_out, str):
+                #     ml_out = json.loads(ml_out)
 
                 numbered_entities = self.transform_to_numbered_format(ml_out.get("User_Sensitive_Entities", {}))
 

@@ -37,3 +37,5 @@ ollama_cache/
 
 *./venv
 backend/venv/
+
+sf-hacks
