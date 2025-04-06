@@ -1,67 +1,26 @@
-import React, { useState } from "react";
-import { Box, Grid, TextField, IconButton, Button, Chip, MenuItem, Slider } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Button, Snackbar, Alert } from "@mui/material";
 import "./Detectors.css";
 import { useSidebar } from "../../context/SidebarContext";
-import DetectorModal from "../DetectorModal/DetectorModal"; // Import the DetectorModal component
+import DetectorModal from "../DetectorModal/DetectorModal";
+import { addDetectorAPI } from "../../api/AddDetectorAPI";
+import { useAuth } from "../../auth/AuthContext";
+import { fetchAllDetectors } from "../../api/FetchAllDetectors";
 
 const Detectors = () => {
   const { isCollapsed } = useSidebar();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState("name");
+  const [sortField, setSortField] = useState("detector_name");
   const [sortDirection, setSortDirection] = useState("asc");
   const [expandedRow, setExpandedRow] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false); // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [username, setUsername] = useState("");
+  const [detectors, setDetectors] = useState([]);
 
-  const [detectors, setDetectors] = useState([
-    { 
-      id: 1, 
-      name: "Credit Card Number", 
-      description: "Identifies credit card numbers in text", 
-      type: "Regex", 
-      pattern: "\\b(?:\\d{4}[- ]?){3}\\d{4}\\b", 
-      createdBy: "John Smith",
-      dateCreated: "2025-01-15",
-      lastModified: "2025-02-20",
-      caseSensitive: false
-    },
-    { 
-      id: 2, 
-      name: "Social Security Number", 
-      description: "Detects SSN formats in content", 
-      type: "Regex", 
-      pattern: "\\b\\d{3}-\\d{2}-\\d{4}\\b", 
-      createdBy: "Sarah Johnson",
-      dateCreated: "2025-01-10",
-      lastModified: "2025-02-18",
-      caseSensitive: false
-    },
-    { 
-      id: 3, 
-      name: "Profanity Filter", 
-      description: "Blocks common profanity", 
-      type: "Keyword", 
-      keywords: ["profanity1", "profanity2", "profanity3"],
-      createdBy: "Mike Davis",
-      dateCreated: "2024-12-05",
-      lastModified: "2025-02-10",
-      caseSensitive: true
-    },
-    { 
-      id: 4, 
-      name: "PII Detector", 
-      description: "Identifies personally identifiable information", 
-      type: "ML", 
-      confidence: "High (95%)",
-      model: "PII-Detect v2.3",
-      createdBy: "Lisa Chen",
-      dateCreated: "2025-01-22",
-      lastModified: "2025-02-22",
-      caseSensitive: true
-    },
-    // ... other detectors
-  ]);
+  const userContext = useAuth();
 
-  // Handle search
+  // Handle search input
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -76,40 +35,72 @@ const Detectors = () => {
     }
   };
 
-  // Handle row click to expand
-  const handleRowClick = (id) => {
-    setExpandedRow(expandedRow === id ? null : id);
+  // Toggle expanded row
+  const handleRowClick = (index) => {
+    setExpandedRow(expandedRow === index ? null : index);
   };
 
-  // Function to add new detector from modal data
-  const handleAddDetector = (newDetector) => {
-    // In a real app, the id would be returned from the backend
-    newDetector.id = detectors.length + 1;
-    setDetectors([...detectors, newDetector]);
+  // Function to add a new detector via API call
+  const handleAddDetector = async (newDetector) => {
+    try {
+      // Attach the username to the payload
+      newDetector.username = username;
+      // Call the API to add the detector
+      const createdDetector = await addDetectorAPI(newDetector);
+      if (createdDetector) {
+        setDetectors([...detectors, newDetector]);
+        setModalOpen(false);
+        setSnackBarOpen(true);
+        console.log("New detector added successfully:", createdDetector);
+      }
+    } catch (error) {
+      console.error("Error adding detector:", error);
+    }
   };
 
-  // Filter and sort detectors
-  const filteredDetectors = detectors.filter(detector => 
-    detector.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    detector.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    detector.type.toLowerCase().includes(searchTerm.toLowerCase())
+  const closeSnackbar = () => {
+    setSnackBarOpen(false);
+  };
+
+  // On mount, fetch detectors from backend using username
+  useEffect(() => {
+    const uname = userContext.username
+      ? userContext.username
+      : sessionStorage.getItem("username");
+    setUsername(uname);
+    fetchAllDetectors(uname).then((detectorList) => {
+      setDetectors(detectorList || []);
+    });
+  }, []);
+
+  // Filter and sort detectors. We now expect each detector to have:
+  // detector_name, detector_type, username, and (optionally) regex_patterns.
+  const filteredDetectors = detectors.filter((detector) =>
+    (detector.detector_name ? detector.detector_name.toLowerCase() : "").includes(searchTerm.toLowerCase()) ||
+    (detector.detector_type ? detector.detector_type.toLowerCase() : "").includes(searchTerm.toLowerCase())
   );
 
   const sortedDetectors = [...filteredDetectors].sort((a, b) => {
+    const fieldA = a[sortField] || "";
+    const fieldB = b[sortField] || "";
     if (sortDirection === "asc") {
-      return a[sortField] > b[sortField] ? 1 : -1;
+      return fieldA > fieldB ? 1 : -1;
     } else {
-      return a[sortField] < b[sortField] ? 1 : -1;
+      return fieldA < fieldB ? 1 : -1;
     }
   });
 
-  // Get type chip color
+  // Get chip color based on type
   const getTypeColor = (type) => {
-    switch(type) {
-      case 'Regex': return 'type-regex';
-      case 'Keyword': return 'type-keyword';
-      case 'ML': return 'type-ml';
-      default: return '';
+    switch (type.toLowerCase()) {
+      case "regex":
+        return "type-regex";
+      case "keywords":
+        return "type-keyword";
+      case "ml_based":
+        return "type-ml";
+      default:
+        return "";
     }
   };
 
@@ -118,15 +109,11 @@ const Detectors = () => {
       <div className="detectors-content">
         <div className="detectors-header">
           <h1 className="page-title">Detectors</h1>
-          <Button 
-            variant="contained" 
-            className="add-detector-btn"
-            onClick={() => setModalOpen(true)} // Open the modal when clicked
-          >
+          <Button variant="contained" className="add-detector-btn" onClick={() => setModalOpen(true)}>
             Add Detector
           </Button>
         </div>
-        
+
         <div className="detectors-container">
           <div className="detectors-tools">
             <div className="search-container">
@@ -134,125 +121,86 @@ const Detectors = () => {
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input 
-                type="text" 
-                className="search-input" 
-                placeholder="Search detectors..." 
-                value={searchTerm} 
-                onChange={handleSearch}
-              />
+              <input type="text" className="search-input" placeholder="Search detectors..." value={searchTerm} onChange={handleSearch} />
             </div>
             <div className="results-count">
-              {filteredDetectors.length} detector{filteredDetectors.length !== 1 ? 's' : ''}
+              {filteredDetectors.length} detector{filteredDetectors.length !== 1 ? "s" : ""}
             </div>
           </div>
-          
+
           <div className="detectors-table-container">
             <table className="detectors-table">
               <thead>
                 <tr>
-                  <th 
-                    className={sortField === "name" ? `sorting ${sortDirection}` : ""}
-                    onClick={() => handleSort("name")}
-                  >
+                  <th className={sortField === "detector_name" ? `sorting ${sortDirection}` : ""} onClick={() => handleSort("detector_name")}>
                     Name
-                    {sortField === "name" && (
-                      <span className="sort-icon">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
+                    {sortField === "detector_name" && (<span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>)}
                   </th>
-                  <th 
-                    className={sortField === "type" ? `sorting ${sortDirection}` : ""}
-                    onClick={() => handleSort("type")}
-                  >
+                  <th className={sortField === "detector_type" ? `sorting ${sortDirection}` : ""} onClick={() => handleSort("detector_type")}>
                     Type
-                    {sortField === "type" && (
-                      <span className="sort-icon">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
+                    {sortField === "detector_type" && (<span className="sort-icon">{sortDirection === "asc" ? "↑" : "↓"}</span>)}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {sortedDetectors.map((detector) => (
-                  <React.Fragment key={detector.id}>
-                    <tr 
-                      className={expandedRow === detector.id ? "row-expanded" : ""}
-                      onClick={() => handleRowClick(detector.id)}
-                    >
-                      <td>{detector.name}</td>
+                {sortedDetectors.map((detector, index) => (
+                  <React.Fragment key={index}>
+                    <tr className={expandedRow === index ? "row-expanded" : ""} onClick={() => handleRowClick(index)}>
+                      <td>{detector.detector_name || "N/A"}</td>
                       <td>
-                        <span className={`type-chip ${getTypeColor(detector.type)}`}>
-                          {detector.type}
+                        <span className={`type-chip ${getTypeColor(detector.detector_type || "")}`}>
+                          {detector.detector_type ? detector.detector_type.toUpperCase() : "N/A"}
                         </span>
                       </td>
                     </tr>
-                    {expandedRow === detector.id && (
+                    {expandedRow === index && (
                       <tr className="expanded-info">
                         <td colSpan="2">
                           <div className="expanded-content">
                             <div className="expanded-details">
                               <div className="detail-group">
-                                <span className="detail-label">Created By:</span>
-                                <span className="detail-value">{detector.createdBy}</span>
+                                <span className="detail-label">Username:</span>
+                                <span className="detail-value">{detector.username || "N/A"}</span>
                               </div>
-                              <div className="detail-group">
-                                <span className="detail-label">Date Created:</span>
-                                <span className="detail-value">{detector.dateCreated}</span>
-                              </div>
-                              <div className="detail-group">
-                                <span className="detail-label">Last Modified:</span>
-                                <span className="detail-value">{detector.lastModified}</span>
-                              </div>
-                              <div className="detail-group">
-                                <span className="detail-label">Case Sensitive:</span>
-                                <span className="detail-value">{detector.caseSensitive ? "Yes" : "No"}</span>
-                              </div>
+                              {detector.detector_type && detector.detector_type.toLowerCase() === "regex" && (
+                                <div className="detail-code">
+                                  <h4>Patterns:</h4>
+                                  {detector.regex_patterns && detector.regex_patterns.length > 0 ? (
+                                    detector.regex_patterns.map((pattern, idx) => (
+                                      <div key={idx} className="code-block">{pattern}</div>
+                                    ))
+                                  ) : (
+                                    <div className="code-block">N/A</div>
+                                  )}
+                                </div>
+                              )}
+
+                              {detector.detector_type && detector.detector_type.toLowerCase() === "ml_based" && (
+                                <div className="detail-code">
+                                  <h4>Description:</h4>
+                                  {detector.description && detector.description.length > 0 ? (
+
+                                    <div className="code-block">{detector.description}</div>
+
+                                  ) : (
+                                    <div className="code-block">N/A</div>
+                                  )}
+                                </div>
+                              )}
+                              {detector.detector_type && detector.detector_type.toLowerCase() === "keywords" && (
+                                <div className="detail-keywords">
+                                  <h4>Keywords:</h4>
+                                  <div className="keywords-list">
+                                    {detector.keywords && detector.keywords.map((keyword, index) => (
+                                      <span key={index} className="keyword-item">{keyword}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            
-                            {detector.type === "Regex" && (
-                              <div className="detail-code">
-                                <h4>Pattern:</h4>
-                                <div className="code-block">{detector.pattern}</div>
-                              </div>
-                            )}
-                            
-                            {detector.type === "Keyword" && (
-                              <div className="detail-keywords">
-                                <h4>Keywords:</h4>
-                                <div className="keywords-list">
-                                  {detector.keywords && detector.keywords.map((keyword, index) => (
-                                    <span key={index} className="keyword-item">{keyword}</span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            
-                            {detector.type === "ML" && (
-                              <div className="detail-ml">
-                                <h4>ML Model Details:</h4>
-                                <div className="ml-details">
-                                  <div className="detail-group">
-                                    <span className="detail-label">Model:</span>
-                                    <span className="detail-value">{detector.model}</span>
-                                  </div>
-                                  <div className="detail-group">
-                                    <span className="detail-label">Confidence:</span>
-                                    <span className="detail-value">{detector.confidence}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            
                             <div className="expanded-actions">
-                              <Button variant="outlined" className="action-edit" size="small">
-                                Edit
-                              </Button>
-                              <Button variant="outlined" className="action-delete" size="small">
-                                Delete
-                              </Button>
+                              <Button variant="outlined" className="action-edit" size="small">Edit</Button>
+                              <Button variant="outlined" className="action-delete" size="small">Delete</Button>
                             </div>
                           </div>
                         </td>
@@ -265,12 +213,12 @@ const Detectors = () => {
           </div>
         </div>
       </div>
-      {/* Render the DetectorModal when modalOpen is true */}
-      <DetectorModal 
-        open={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        onSave={handleAddDetector} 
-      />
+      <DetectorModal open={modalOpen} onClose={() => setModalOpen(false)} onSave={handleAddDetector} />
+      <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={closeSnackbar} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={closeSnackbar} severity="success" sx={{ width: "100%" }}>
+          Detector Added Successfully!
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

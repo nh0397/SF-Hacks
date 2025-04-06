@@ -199,65 +199,6 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        
-        {/* Violation Details Table */}
-        <div className="chart-container">
-          <div className="chart-header">
-            <h2 className="chart-title">Recent Violations</h2>
-          </div>
-          <div className="violation-table">
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'left' }}>
-                  <th style={{ padding: '12px 8px' }}>User</th>
-                  <th style={{ padding: '12px 8px' }}>Department</th>
-                  <th style={{ padding: '12px 8px' }}>Violation Type</th>
-                  <th style={{ padding: '12px 8px' }}>Platform</th>
-                  <th style={{ padding: '12px 8px' }}>Time</th>
-                  <th style={{ padding: '12px 8px' }}>Severity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { user: 'john.smith', dept: 'Engineering', type: 'Prompt Injection', platform: 'Claude 🧠', time: '2 hours ago', severity: 'High' },
-                  { user: 'amy.jones', dept: 'Marketing', type: 'Sensitive Data', platform: 'ChatGPT 🤖', time: '4 hours ago', severity: 'Medium' },
-                  { user: 'raj.patel', dept: 'Engineering', type: 'Unauthorized Access', platform: 'Claude 🧠', time: '8 hours ago', severity: 'Critical' },
-                  { user: 'alex.wilson', dept: 'Sales', type: 'Prompt Injection', platform: 'ChatGPT 🤖', time: '1 day ago', severity: 'Low' },
-                  { user: 'sarah.lee', dept: 'HR', type: 'Sensitive Data', platform: 'CoPilot 👨‍💻', time: '1 day ago', severity: 'Medium' },
-                  { user: 'mike.brown', dept: 'Engineering', type: 'Prompt Injection', platform: 'CoPilot 👨‍💻', time: '2 days ago', severity: 'Medium' },
-                  { user: 'emma.davis', dept: 'Marketing', type: 'Unauthorized Access', platform: 'ChatGPT 🤖', time: '2 days ago', severity: 'High' },
-                  { user: 'david.garcia', dept: 'Sales', type: 'Sensitive Data', platform: 'Claude 🧠', time: '3 days ago', severity: 'Low' },
-                ].map((item, index) => (
-                  <tr key={index} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <td style={{ padding: '12px 8px' }}>{item.user}</td>
-                    <td style={{ padding: '12px 8px' }}>{item.dept}</td>
-                    <td style={{ padding: '12px 8px' }}>{item.type}</td>
-                    <td style={{ padding: '12px 8px' }}>{item.platform}</td>
-                    <td style={{ padding: '12px 8px' }}>{item.time}</td>
-                    <td style={{ padding: '12px 8px' }}>
-                      <span style={{ 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        backgroundColor: 
-                          item.severity === 'Low' ? 'rgba(0, 71, 171, 0.1)' : 
-                          item.severity === 'Medium' ? 'rgba(0, 71, 171, 0.3)' : 
-                          item.severity === 'High' ? 'rgba(0, 71, 171, 0.6)' : 
-                          'rgba(0, 71, 171, 0.9)',
-                        color: 
-                          item.severity === 'Low' ? '#0047AB' : 
-                          item.severity === 'Medium' ? '#0047AB' : 
-                          item.severity === 'High' ? 'white' : 
-                          'white'
-                      }}>
-                        {item.severity}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </main>
     </div>
   );

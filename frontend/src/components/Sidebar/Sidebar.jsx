@@ -1,7 +1,15 @@
 import React from 'react';
-import { LayoutDashboard, ShieldCheck, FileText, ChevronLeft } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  ShieldCheck, 
+  File, 
+  AlertTriangle, 
+  Shield, 
+  UserCheck, 
+  ChevronLeft 
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useSidebar } from '../../context/SidebarContext'; // ✅ Import Sidebar Context
+import { useSidebar } from '../../context/SidebarContext';
 import './Sidebar.css';
 
 const SidebarItem = ({ icon: Icon, label, active, onClick }) => {
@@ -24,7 +32,7 @@ const SidebarItem = ({ icon: Icon, label, active, onClick }) => {
 };
 
 const Sidebar = () => {
-  const { isCollapsed, setIsCollapsed } = useSidebar(); // ✅ Use context instead of local state
+  const { isCollapsed, setIsCollapsed } = useSidebar();
   const [activeItem, setActiveItem] = React.useState('dashboard');
   const navigate = useNavigate();
 
@@ -65,10 +73,28 @@ const Sidebar = () => {
               onClick={() => handleNavigation('/detectors', 'detectors')} 
             />
             <SidebarItem 
-              icon={FileText} 
+              icon={File} 
               label={isCollapsed ? '' : 'Policies'} 
               active={activeItem === 'policies'} 
               onClick={() => handleNavigation('/policies', 'policies')} 
+            />
+            <SidebarItem 
+              icon={AlertTriangle} 
+              label={isCollapsed ? '' : 'Violations'} 
+              active={activeItem === 'violations'} 
+              onClick={() => handleNavigation('/violations', 'violations')} 
+            />
+            <SidebarItem 
+              icon={Shield} 
+              label={isCollapsed ? '' : 'Firewall'} 
+              active={activeItem === 'firewall'} 
+              onClick={() => handleNavigation('/firewall', 'firewall')} 
+            />
+            <SidebarItem 
+              icon={UserCheck} 
+              label={isCollapsed ? '' : 'RBAC'} 
+              active={activeItem === 'rbac'} 
+              onClick={() => handleNavigation('/rbac', 'rbac')} 
             />
           </ul>
         </div>

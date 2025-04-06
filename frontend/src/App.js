@@ -10,6 +10,9 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import "./App.css"; // ✅ Import global styles
 import Detectors from "./pages/Detectors/Detectors";
 import Policies from "./pages/Policies/Policies";
+import Violations from "./pages/Violations/Violations";
+import Firewall from "./pages/Firewall/Firewall";
+import Rbac from "./pages/RBAC/Rbac";
 
 const MainLayout = ({ children }) => {
   const { isCollapsed } = useSidebar(); // ✅ Access sidebar state
@@ -41,32 +44,62 @@ export default function App() {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <MainLayout>
                     <Dashboard />
                   </MainLayout>
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
 
             <Route
               path="/detectors"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <MainLayout>
                     <Detectors />
                   </MainLayout>
-                </ProtectedRoute>
+                // </ProtectedRoute>
               }
             />
             <Route
               path="/policies"
               element={
-                <ProtectedRoute>
+                // <ProtectedRoute>
                   <MainLayout>
                     <Policies />
                   </MainLayout>
-                </ProtectedRoute>
+                // </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/violations"
+              element={
+                // <ProtectedRoute>
+                  <MainLayout>
+                    <Violations />
+                  </MainLayout>
+                // </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/firewall"
+              element={
+                // <ProtectedRoute>
+                  <MainLayout>
+                    <Firewall />
+                  </MainLayout>
+                // </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rbac"
+              element={
+                // <ProtectedRoute>
+                  <MainLayout>
+                    <Rbac />
+                  </MainLayout>
+                // </ProtectedRoute>
               }
             />
           </Routes>

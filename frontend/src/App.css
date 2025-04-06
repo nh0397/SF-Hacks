@@ -88,13 +88,12 @@
 .main-content {
   flex-grow: 1;
   margin-left: 256px;
-  padding: 20px;
   overflow-y: auto;
   background-color: #f4f6f8;
   transition: margin-left 0.3s ease-in-out;
-  width: 100%;
+  width: calc(100vw - 256px);
   box-sizing: border-box;
-  height: 92vh;
+  height: calc(100vh - 64px);
   overflow: hidden;
 
 }

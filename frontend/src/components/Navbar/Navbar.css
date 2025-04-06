@@ -31,23 +31,22 @@
 .logo-icon {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, white, #003b8b); /* 🔵 Gradient with darker shade */
-    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.logo-icon span {
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-}
 
 .logo-text {
     margin-left: 8px;
     font-weight: 600;
     color: white; /* 🔵 White text for contrast */
+}
+
+.logo{
+    width: 30px;
+    height: 32px;
+    padding-top: 10px;
 }
 
 /* Search Styles */

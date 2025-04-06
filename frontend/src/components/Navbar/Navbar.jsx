@@ -3,6 +3,7 @@ import { Bell, Search, ChevronDown, LogOut } from 'lucide-react';
 import { Menu, MenuItem, MenuList, ClickAwayListener, Paper, Grow, Popper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
+import logo from "../../assets/logo.png"
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -39,8 +40,8 @@ const Navbar = () => {
       {/* Logo */}
       <div className="navbar-logo">
         <div className="logo-container">
-          <div className="logo-icon">
-            <span>SA</span>
+          <div className="logo-icon" >
+            <img src={logo} className='logo'/>
           </div>
           <span className="logo-text">Secure Alley</span>
         </div>

@@ -9,7 +9,7 @@ import { useAuth } from "../../auth/AuthContext"; // ✅ Import AuthContext
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ Get login function from context
+  const { login } = useAuth(); // Get login function from AuthContext
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ username: "", password: "" });
 
@@ -21,13 +21,17 @@ export default function Login() {
     e.preventDefault();
     try {
       const response = await loginAPI(formData);
-      sessionStorage.setItem("token", response.access_token); // ✅ Store JWT for backend requests
-      sessionStorage.setItem("username", response.user.username); // ✅ Store username
+      
+      // Call the AuthContext login method with the returned user data.
+      // Adjust the property names based on your API response.
+      login({ username: response.username || (response.user && response.user.username) });
+      
+      // Optionally store the username in sessionStorage if needed.
+      sessionStorage.setItem("username", response.username || (response.user && response.user.username));
 
-      login({ username: response.user.username }); // ✅ Update AuthContext
-      navigate("/dashboard"); // ✅ Redirect to dashboard
+      navigate("/dashboard"); // Redirect to dashboard
     } catch (error) {
-      alert("Login failed. Check credentials."); // Show error message
+      alert("Login failed. Check credentials.");
     }
   };
 
@@ -42,8 +46,12 @@ export default function Login() {
       <div className="login-right">
         <Box className="login-box box-top">
           <img src={logo} alt="Secure Alley Logo" className="logo" />
-          <Typography variant="h4" className="welcome-text">Welcome to Secure Alley</Typography>
-          <Typography variant="body2" className="subtext">Sign in with your credentials</Typography>
+          <Typography variant="h4" className="welcome-text">
+            Welcome to Secure Alley
+          </Typography>
+          <Typography variant="body2" className="subtext">
+            Sign in with your credentials
+          </Typography>
         </Box>
         <Box className="login-box box-bottom">
           <form onSubmit={handleSubmit} className="login-form">
