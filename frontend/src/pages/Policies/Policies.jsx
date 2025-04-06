@@ -197,7 +197,7 @@ const Policies = () => {
               />
             </div>
             <div className="results-count">
-              {filteredPolicies.length} policy
+              {filteredPolicies.length} polic
               {filteredPolicies.length !== 1 ? "ies" : "y"}
             </div>
           </div>
@@ -249,7 +249,7 @@ const Policies = () => {
                       <td>{policy.description}</td>
                       <td>
                         <div className="detectors-list">
-                          {policy.detectors.join(", ")}
+                              {(policy.detectors || []).join(", ")}
                         </div>
                       </td>
                       <td
@@ -305,7 +305,7 @@ const Policies = () => {
                             <div className="detail-detectors">
                               <h4>Detectors:</h4>
                               <div className="detectors-chips-list">
-                                {policy.detectors.map((detector, index) => (
+                                {(policy.detectors || []).map((detector, index) => (
                                   <span key={index} className="detector-chip">
                                     {detector}
                                   </span>
