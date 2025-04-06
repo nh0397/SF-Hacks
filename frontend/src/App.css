@@ -1,0 +1,104 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* App container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Navbar */
+.navbar {
+  height: 64px;
+  background-color: #0047AB;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* Content Wrapper */
+.content-container {
+  display: flex;
+  flex-grow: 1;
+  padding-top: 64px; /* Ensure content starts below navbar */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 256px;
+  height: calc(100vh - 64px);
+  background-color: white;
+  transition: width 0.3s ease-in-out;
+  border-right: 1px solid #ddd;
+  position: fixed;
+  left: 0;
+  top: 64px;
+  overflow: hidden;
+}
+
+/* Sidebar Collapsed */
+.sidebar-collapsed .sidebar {
+  width: 64px;
+}
+
+/* Main Content */
+.main-content {
+  flex-grow: 1;
+  margin-left: 256px;
+  overflow-y: auto;
+  background-color: #f4f6f8;
+  transition: margin-left 0.3s ease-in-out;
+  width: calc(100vw - 256px);
+  box-sizing: border-box;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+
+}
+
+/* Adjust when sidebar is collapsed */
+.sidebar-collapsed .main-content {
+  margin-left: 64px;
+}

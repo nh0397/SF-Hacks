@@ -1,0 +1,309 @@
+.dashboard {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.dashboard-content {
+  padding: 24px 32px 32px 32px;
+  transition: padding-left 0.3s ease-in-out;
+  overflow-y: auto;
+  height: calc(100vh - 60px); /* Adjust based on your header height */
+}
+
+/* Adjust content when sidebar is collapsed */
+.sidebar-collapsed ~ .dashboard-content {
+  padding-left: 96px;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stats-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stats-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-label {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+}
+
+.stats-value {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 4px 0 0 0;
+  color: #0047AB;
+}
+
+.stats-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.stats-primary {
+  background-color: rgba(0, 71, 171, 0.1);
+  color: #0047AB;
+}
+
+/* Platform Violations Section */
+.platform-cards {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .platform-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.platform-card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.platform-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background-color: #0047AB;
+  color: white;
+}
+
+.platform-info {
+  flex: 1;
+}
+
+.platform-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #0047AB;
+}
+
+.platform-value {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0 8px 0;
+}
+
+.platform-bar-container {
+  height: 8px;
+  width: 100%;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.platform-bar {
+  height: 100%;
+  background-color: #0047AB;
+  border-radius: 4px;
+}
+
+/* Chart Container */
+.chart-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.chart-content {
+  width: 100%;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.chart-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: #0047AB;
+}
+
+.chart-filter {
+  color: #0047AB;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.chart-filter-icon {
+  margin-left: 8px;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.dashboard-time-admitted,
+.dashboard-division {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+  color: #0047AB;
+}
+
+/* Animation for cards */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stats-card, .platform-card {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Stagger animation for stats cards */
+.stats-card:nth-child(1), .platform-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stats-card:nth-child(2), .platform-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.stats-card:nth-child(3), .platform-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.stats-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+/* Violation Table Styles */
+.violation-table {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 4px;
+}
+
+.violation-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.violation-table th {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  color: #0047AB;
+  border-bottom: 2px solid #0047AB;
+}
+
+/* Scrollbar styling */
+.violation-table::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.violation-table::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.violation-table::-webkit-scrollbar-thumb {
+  background: #0047AB;
+  border-radius: 10px;
+}
+
+.violation-table::-webkit-scrollbar-thumb:hover {
+  background: #003d91;
+}
+
+/* Ensuring the main content can scroll */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
+}
