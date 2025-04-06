@@ -3,77 +3,42 @@ import { Button, Switch, Snackbar, Alert } from "@mui/material";
 import "./Policies.css";
 import { useSidebar } from "../../context/SidebarContext";
 import PolicyModal from "../PolicyModal/PolicyModal"; // Import the PolicyModal component
-import { addPolicyAPI } from "../../api/AddPoliciesAPI"
+import { addPolicyAPI } from "../../api/AddPoliciesAPI";
 import { fetchAllPolicies } from "../../api/FetchAllPolicies";
-import { useAuth } from "../../auth/AuthContext";
 import { fetchAllDetectors } from "../../api/FetchAllDetectors";
-
-
+import { useAuth } from "../../auth/AuthContext";
+import { DeletePolicyAPI } from "../../api/DeletePolicyAPI";
 
 const Policies = () => {
   const { isCollapsed } = useSidebar();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState("name");
+  const [sortField, setSortField] = useState("policy_name");
   const [sortDirection, setSortDirection] = useState("asc");
   const [expandedRow, setExpandedRow] = useState(null);
   const [modalOpen, setModalOpen] = useState(false); // Modal state
   const [formData, setFormData] = useState(null); // To store form data for validation
-  const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [username, setUsername] = useState("");
-  const [detectors, setDetectors] = useState([])
+  const [detectors, setDetectors] = useState([]);
+  const [policies, setPolicies] = useState([]);
+
+  // Combined snackbar state for both add and delete notifications.
+  const [snackBar, setSnackBar] = useState({
+    open: false,
+    message: "",
+    severity: "success"
+  });
 
   const userContext = useAuth();
-  // Sample detectors data (in a real app, fetched from an API)
-  // const detectors = [
-  //   { id: 1, name: "Credit Card Number" },
-  //   { id: 2, name: "Social Security Number" },
-  //   { id: 3, name: "Profanity Filter" },
-  //   { id: 4, name: "PII Detector" },
-  // ];
 
-  // Sample policies
-  const [policies, setPolicies] = useState([
-    // {
-    //   id: 1,
-    //   policy_name: "Payment Information Security",
-    //   description: "Protect customer payment information",
-    //   detectors: ["Credit Card Number", "PII Detector"],
-    //   status: true,
-    //   createdBy: "John Smith",
-    //   dateCreated: "2025-01-15",
-    //   lastModified: "2025-02-20"
-    // },
-    // {
-    //   id: 2,
-    //   policy_name: "Personal Data Protection",
-    //   description: "Safeguard all personal identifiable information",
-    //   detectors: ["Social Security Number", "PII Detector"],
-    //   status: true,
-    //   createdBy: "Sarah Johnson",
-    //   dateCreated: "2025-01-10",
-    //   lastModified: "2025-02-18"
-    // },
-    // {
-    //   id: 3,
-    //   policy_name: "Content Moderation",
-    //   description: "Filter inappropriate content",
-    //   detectors: ["Profanity Filter"],
-    //   status: false,
-    //   createdBy: "Mike Davis",
-    //   dateCreated: "2024-12-05",
-    //   lastModified: "2025-02-10"
-    // },
-    // {
-    //   id: 4,
-    //   policy_name: "Comprehensive Security",
-    //   description: "Apply all security measures",
-    //   detectors: ["Credit Card Number", "Social Security Number", "PII Detector"],
-    //   status: true,
-    //   createdBy: "Lisa Chen",
-    //   dateCreated: "2025-01-22",
-    //   lastModified: "2025-02-22"
-    // },
-  ]);
+  // Helper function to show snackbar
+  const showSnackbar = (message, severity = "success") => {
+    setSnackBar({ open: true, message, severity });
+  };
+
+  // Close snackbar
+  const closeSnackbar = () => {
+    setSnackBar({ ...snackBar, open: false });
+  };
 
   // Handle search
   const handleSearch = (e) => {
@@ -97,31 +62,23 @@ const Policies = () => {
 
   // Handle status toggle
   const handleStatusToggle = (id, newStatus) => {
-    setPolicies(policies.map(policy =>
-      policy.id === id ? { ...policy, status: newStatus } : policy
-    ));
+    setPolicies(
+      policies.map((policy) =>
+        policy.id === id ? { ...policy, status: newStatus } : policy
+      )
+    );
   };
 
   // Function to validate form data
   const isFormValid = (data) => {
-    // Check if name and description are not empty
     if (!data.policy_name || !data.policy_name.trim()) return false;
     if (!data.description || !data.description.trim()) return false;
-
-    // Check if at least one detector is selected
     if (!data.detectors || data.detectors.length === 0) return false;
-
-    // Validate thresholds for each detector
     for (const detector of data.detectors) {
       if (!data.thresholds || !data.thresholds[detector]) return false;
     }
-
-    // Check if action is selected
     if (!data.action) return false;
-
-    // Check if at least one user/group is selected
     if (!data.users || data.users.length === 0) return false;
-
     return true;
   };
 
@@ -133,15 +90,11 @@ const Policies = () => {
 
   // Function to add new policy from modal data
   const handleAddPolicy = async (newPolicy) => {
-    // Console log the data
     console.log("Adding new policy:", newPolicy);
-
-
-    // Add creation and modification dates
     const now = new Date().toISOString().split("T")[0];
-    newPolicy.username = sessionStorage.getItem('username');
+    newPolicy.username = sessionStorage.getItem("username");
     newPolicy.id = policies.length + 1;
-    newPolicy.createdBy = sessionStorage.getItem('username');
+    newPolicy.createdBy = sessionStorage.getItem("username");
     newPolicy.dateCreated = now;
     newPolicy.lastModified = now;
     newPolicy.status = true;
@@ -149,32 +102,28 @@ const Policies = () => {
     if (createdPolicy) {
       setPolicies([...policies, newPolicy]);
       setModalOpen(false);
-      setFormData(null); // Reset form data
-      setModalOpen(false);
-      setSnackBarOpen(true);
+      setFormData(null);
+      showSnackbar("Policy Added Successfully!", "success");
       console.log("New Policy added successfully:", createdPolicy);
     }
-
   };
 
-  const closeSnackbar = () => {
-    setSnackBarOpen(false);
-  };
-
-  // Filter and sort policies
-  const filteredPolicies = policies.filter(policy =>
-    policy.policy_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    policy.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    policy.detectors.some(detector => detector.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  const sortedPolicies = [...filteredPolicies].sort((a, b) => {
-    if (sortDirection === "asc") {
-      return a[sortField] > b[sortField] ? 1 : -1;
-    } else {
-      return a[sortField] < b[sortField] ? 1 : -1;
+  // Function to delete a policy using the DeletePolicyAPI.
+  // The click event is passed to stop propagation so that the row doesn't toggle.
+  const handleDeletePolicy = async (username, policyName, e) => {
+    if (e) e.stopPropagation();
+    try {
+      const result = await DeletePolicyAPI({ username, policy_name: policyName });
+      setPolicies(policies.filter((policy) => policy.policy_name !== policyName));
+      showSnackbar("Policy deleted successfully.", "success");
+      console.log("Policy deleted successfully:", result);
+    } catch (error) {
+      console.error("Error deleting policy:", error);
+      const errorMessage =
+        error.response?.data?.message || "Error deleting policy.";
+      showSnackbar(errorMessage, "error");
     }
-  });
+  };
 
   useEffect(() => {
     const uname = userContext.username
@@ -187,7 +136,24 @@ const Policies = () => {
     fetchAllDetectors(uname).then((detectorList) => {
       setDetectors(detectorList || []);
     });
-  }, []);
+  }, [userContext.username]);
+
+  const filteredPolicies = policies.filter(
+    (policy) =>
+      policy.policy_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      policy.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      policy.detectors.some((detector) =>
+        detector.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+  );
+
+  const sortedPolicies = [...filteredPolicies].sort((a, b) => {
+    if (sortDirection === "asc") {
+      return a[sortField] > b[sortField] ? 1 : -1;
+    } else {
+      return a[sortField] < b[sortField] ? 1 : -1;
+    }
+  });
 
   return (
     <div className="policies">
@@ -197,7 +163,7 @@ const Policies = () => {
           <Button
             variant="contained"
             className="add-policy-btn"
-            onClick={() => setModalOpen(true)} // Open the modal when clicked
+            onClick={() => setModalOpen(true)}
           >
             Add Policy
           </Button>
@@ -206,7 +172,18 @@ const Policies = () => {
         <div className="policies-container">
           <div className="policies-tools">
             <div className="search-container">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="search-icon"
+              >
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
@@ -219,7 +196,8 @@ const Policies = () => {
               />
             </div>
             <div className="results-count">
-              {filteredPolicies.length} policy{filteredPolicies.length !== 1 ? 'ies' : 'y'}
+              {filteredPolicies.length} policy
+              {filteredPolicies.length !== 1 ? "ies" : "y"}
             </div>
           </div>
 
@@ -228,10 +206,12 @@ const Policies = () => {
               <thead>
                 <tr>
                   <th
-                    className={sortField === "policy_name" ? `sorting ${sortDirection}` : ""}
+                    className={
+                      sortField === "policy_name" ? `sorting ${sortDirection}` : ""
+                    }
                     onClick={() => handleSort("policy_name")}
                   >
-                    Name
+                    Name{" "}
                     {sortField === "policy_name" && (
                       <span className="sort-icon">
                         {sortDirection === "asc" ? "↑" : "↓"}
@@ -239,22 +219,20 @@ const Policies = () => {
                     )}
                   </th>
                   <th
-                    className={sortField === "description" ? `sorting ${sortDirection}` : ""}
+                    className={
+                      sortField === "description" ? `sorting ${sortDirection}` : ""
+                    }
                     onClick={() => handleSort("description")}
                   >
-                    Description
+                    Description{" "}
                     {sortField === "description" && (
                       <span className="sort-icon">
                         {sortDirection === "asc" ? "↑" : "↓"}
                       </span>
                     )}
                   </th>
-                  <th>
-                    Detectors
-                  </th>
-                  <th>
-                    Status
-                  </th>
+                  <th>Detectors</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,12 +251,14 @@ const Policies = () => {
                       </td>
                       <td
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent row expansion when toggling status
+                          e.stopPropagation();
                         }}
                       >
                         <Switch
                           checked={policy.status}
-                          onChange={(e) => handleStatusToggle(policy.id, e.target.checked)}
+                          onChange={(e) =>
+                            handleStatusToggle(policy.id, e.target.checked)
+                          }
                           color="primary"
                           size="small"
                         />
@@ -291,39 +271,65 @@ const Policies = () => {
                             <div className="expanded-details">
                               <div className="detail-group">
                                 <span className="detail-label">Created By:</span>
-                                <span className="detail-value">{policy.createdBy}</span>
+                                <span className="detail-value">
+                                  {policy.createdBy}
+                                </span>
                               </div>
                               <div className="detail-group">
                                 <span className="detail-label">Date Created:</span>
-                                <span className="detail-value">{policy.dateCreated}</span>
+                                <span className="detail-value">
+                                  {policy.dateCreated}
+                                </span>
                               </div>
                               <div className="detail-group">
-                                <span className="detail-label">Last Modified:</span>
-                                <span className="detail-value">{policy.lastModified}</span>
+                                <span className="detail-label">
+                                  Last Modified:
+                                </span>
+                                <span className="detail-value">
+                                  {policy.lastModified}
+                                </span>
                               </div>
                               <div className="detail-group">
                                 <span className="detail-label">Status:</span>
                                 <span className="detail-value">
-                                  <span className={`status-indicator ${policy.status ? 'active' : 'inactive'}`}></span>
-                                  {policy.status ? 'Active' : 'Inactive'}
+                                  <span
+                                    className={`status-indicator ${policy.status ? "active" : "inactive"
+                                      }`}
+                                  ></span>
+                                  {policy.status ? "Active" : "Inactive"}
                                 </span>
                               </div>
                             </div>
-
                             <div className="detail-detectors">
                               <h4>Detectors:</h4>
                               <div className="detectors-chips-list">
                                 {policy.detectors.map((detector, index) => (
-                                  <span key={index} className="detector-chip">{detector}</span>
+                                  <span key={index} className="detector-chip">
+                                    {detector}
+                                  </span>
                                 ))}
                               </div>
                             </div>
-
                             <div className="expanded-actions">
-                              <Button variant="outlined" className="action-edit" size="small">
+                              <Button
+                                variant="outlined"
+                                className="action-edit"
+                                size="small"
+                              >
                                 Edit
                               </Button>
-                              <Button variant="outlined" className="action-delete" size="small">
+                              <Button
+                                variant="outlined"
+                                className="action-delete"
+                                size="small"
+                                onClick={(e) =>
+                                  handleDeletePolicy(
+                                    policy.username,
+                                    policy.policy_name,
+                                    e
+                                  )
+                                }
+                              >
                                 Delete
                               </Button>
                             </div>
@@ -338,7 +344,6 @@ const Policies = () => {
           </div>
         </div>
       </div>
-      {/* Render the PolicyModal when modalOpen is true */}
       <PolicyModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -347,9 +352,14 @@ const Policies = () => {
         onUpdate={handleFormUpdate}
         isValid={formData ? isFormValid(formData) : false}
       />
-      <Snackbar open={snackBarOpen} autoHideDuration={6000} onClose={closeSnackbar} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert onClose={closeSnackbar} severity="success" sx={{ width: "100%" }}>
-          Policy Added Successfully!
+      <Snackbar
+        open={snackBar.open}
+        autoHideDuration={6000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={closeSnackbar} severity={snackBar.severity} sx={{ width: "100%" }}>
+          {snackBar.message}
         </Alert>
       </Snackbar>
     </div>

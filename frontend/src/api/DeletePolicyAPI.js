@@ -1,7 +1,7 @@
 import apiClient from "./apiClient"; 
 
 
-export const DeletePolicy = async (policyData) => {
+export const DeletePolicyAPI = async (policyData) => {
   try {
     const { username,policy_name } = policyData;
 
