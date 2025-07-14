@@ -94,7 +94,7 @@ def extract_sensitive_entities(user_input, sensitive_data_json, max_retries=3, b
 
     url = "http://localhost:11434/api/chat"
     payload = {
-        "model": "mistral",
+        "model": "deepseek-r1:latest",
         "messages": [
             {"role": "system", "content": system_prompt.strip()},
             {"role": "user", "content": user_prompt.strip()}
